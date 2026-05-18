@@ -18,6 +18,14 @@ const clickButton = document.getElementById("clickButton");
 const saveButton = document.getElementById("saveButton");
 const statusEl = document.getElementById("status");
 const loginStatusEl = document.getElementById("loginStatus");
+let autoSaveRemaining = 30;
+
+function updateAutoSaveText() {
+  const saveType = currentUser ? "서버" : "로컬";
+
+  statusEl.innerText =
+    `${saveType} 자동 저장까지 ${autoSaveRemaining}초`;
+}
 
 let currentUser = null;
 let score = 0;
@@ -48,7 +56,10 @@ async function saveGame() {
     localStorage.setItem(LOCAL_SAVE_KEY, JSON.stringify(saveData));
     statusEl.innerText = "로컬스토리지에 저장 완료";
   }
+  autoSaveRemaining = 30;
+  updateAutoSaveText();
 }
+updateAutoSaveText();
 
 async function loadGame() {
   if (currentUser) {
@@ -100,5 +111,12 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 setInterval(async () => {
-  await saveGame();
-}, 30000);
+  autoSaveRemaining--;
+
+  if (autoSaveRemaining <= 0) {
+    await saveGame();
+    autoSaveRemaining = 30;
+  }
+
+  updateAutoSaveText();
+}, 1000);
