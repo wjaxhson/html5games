@@ -6,7 +6,10 @@ import {
 
 import { auth } from "./shared/firebase.js";
 
+import { games } from "./shared/game-list.js";
+
 const provider = new GoogleAuthProvider();
+const gameListEl = document.getElementById("gameList");
 
 const loginBtn = document.getElementById("loginBtn");
 const userText = document.getElementById("userText");
@@ -24,3 +27,16 @@ onAuthStateChanged(auth, (user) => {
     loginBtn.style.display = "inline-block";
   }
 });
+
+games
+  .filter((game) => game.visible)
+  .forEach((game) => {
+    const li = document.createElement("li");
+
+    li.innerHTML = `
+      <a href="${game.path}">${game.title}</a>
+      <p>${game.description}</p>
+    `;
+
+    gameListEl.appendChild(li);
+  });
