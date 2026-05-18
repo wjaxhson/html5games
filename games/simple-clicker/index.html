@@ -17,10 +17,6 @@
       padding: 40px 20px;
     }
 
-    h1 {
-      margin-bottom: 10px;
-    }
-
     #score {
       font-size: 48px;
       font-weight: bold;
@@ -37,40 +33,33 @@
       cursor: pointer;
     }
 
-    #clickButton:active {
-      transform: scale(0.97);
+    #saveButton {
+      margin-top: 20px;
+      padding: 10px 20px;
     }
 
-    a {
-      display: inline-block;
-      margin-top: 30px;
-      color: #333;
+    #status {
+      margin-top: 20px;
+      color: #555;
     }
   </style>
 </head>
 <body>
   <main>
     <h1>Simple Clicker</h1>
-    <p>버튼을 눌러 점수를 올려보세요.</p>
+    <p id="loginStatus">로그인 확인 중...</p>
 
     <div id="score">0</div>
 
     <button id="clickButton">클릭!</button>
-
     <br />
+    <button id="saveButton">직접 저장</button>
+
+    <p id="status">저장 상태 없음</p>
+
     <a href="../../">메인으로 돌아가기</a>
   </main>
 
-  <script>
-    const scoreEl = document.querySelector("#score");
-    const clickButton = document.querySelector("#clickButton");
-
-    let score = 0;
-
-    clickButton.addEventListener("click", () => {
-      score += 1;
-      scoreEl.textContent = score;
-    });
-  </script>
+  <script type="module" src="./game.js"></script>
 </body>
 </html>
