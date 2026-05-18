@@ -3,15 +3,9 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
 import {
   getAuth,
   GoogleAuthProvider,
-  signInWithPopup
+  signInWithPopup,
+  onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-import {
-  getFirestore,
-  doc,
-  setDoc,
-  getDoc
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDiKBsyStMu6M70dWsW76iattfxj1Ike4k",
@@ -24,51 +18,21 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db = getFirestore(app);
 const provider = new GoogleAuthProvider();
 
-let currentUser = null;
+const loginBtn = document.getElementById("loginBtn");
+const userText = document.getElementById("userText");
 
-document.getElementById("loginBtn").addEventListener("click", async () => {
-  const result = await signInWithPopup(auth, provider);
-  currentUser = result.user;
-
-  document.getElementById("userText").innerText =
-    currentUser.displayName + " 로그인 성공";
+loginBtn.addEventListener("click", async () => {
+  await signInWithPopup(auth, provider);
 });
 
-document.getElementById("saveBtn").addEventListener("click", async () => {
-  if (!currentUser) {
-    alert("먼저 로그인하세요.");
-    return;
-  }
-
-  const saveData = {
-    stage: 1,
-    gold: Math.floor(Math.random() * 1000),
-    hp: 30,
-    updatedAt: Date.now()
-  };
-
-  await setDoc(doc(db, "saves", currentUser.uid), saveData);
-
-  document.getElementById("saveText").innerText =
-    "저장 완료: " + JSON.stringify(saveData);
-});
-
-document.getElementById("loadBtn").addEventListener("click", async () => {
-  if (!currentUser) {
-    alert("먼저 로그인하세요.");
-    return;
-  }
-
-  const docSnap = await getDoc(doc(db, "saves", currentUser.uid));
-
-  if (docSnap.exists()) {
-    document.getElementById("saveText").innerText =
-      "불러오기 완료: " + JSON.stringify(docSnap.data());
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    userText.innerText = `${user.displayName} 로그인 중`;
+    loginBtn.style.display = "none";
   } else {
-    document.getElementById("saveText").innerText =
-      "저장된 데이터가 없습니다.";
+    userText.innerText = "로그인하지 않음";
+    loginBtn.style.display = "inline-block";
   }
 });
