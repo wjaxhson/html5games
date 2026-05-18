@@ -8,13 +8,28 @@
 <body>
   <h1>HTML5 Games</h1>
 
-  <button>로그인</button>
+  <section>
+    <h2>로그인</h2>
+    <button id="loginBtn">Google 로그인</button>
+    <p id="userText">로그인하지 않음</p>
+  </section>
 
-  <h2>게임 목록</h2>
-  <ul>
-    <li>
-      <a href="./games/simple-clicker/">Simple Clicker</a>
-    </li>
-  </ul>
+  <section>
+    <h2>저장 테스트</h2>
+    <button id="saveBtn">저장하기</button>
+    <button id="loadBtn">불러오기</button>
+    <p id="saveText">저장 데이터 없음</p>
+  </section>
+
+  <section>
+    <h2>게임 목록</h2>
+    <ul>
+      <li>
+        <a href="./games/simple-clicker/">Simple Clicker</a>
+      </li>
+    </ul>
+  </section>
+
+  <script type="module" src="./main.js"></script>
 </body>
 </html>
