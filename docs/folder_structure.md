@@ -174,6 +174,9 @@ users/abcd1234/games/simple-clicker
 
 게임 자체 로직은 `games/` 내부에서 관리한다.
 
+자세한 게임 목록 관리 방식은
+`docs/game_list_system.md` 를 참고한다.
+
 ---
 
 # 개발 방향
