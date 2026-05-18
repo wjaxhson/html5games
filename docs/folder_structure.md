@@ -65,7 +65,7 @@ UI
 
 이건 지금 매우 중요합니다.
 
-md
+```md
 # 저장 구조
 
 Firestore 저장 구조:
@@ -80,7 +80,7 @@ users/abcd1234/games/simple-clicker
 
 # 저장 데이터 예시
 
-json
+```json
 {
   "gameId": "simple-clicker",
   "score": 15,
