@@ -23,3 +23,7 @@ root/
 │   └─ ui.js
 │
 └─ docs/
+
+# 각 게임은 반드시 다음 구조를 따른다.
+
+games/{game-id}/index.html
