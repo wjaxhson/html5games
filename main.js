@@ -17,7 +17,7 @@ loginBtn.addEventListener("click", async () => {
 
 onAuthStateChanged(auth, (user) => {
   if (user) {
-    userText.innerText = `${user.displayName} 로그인 중`;
+    userText.innerText = `${user.displayName}님 환영합니다!`;
     loginBtn.style.display = "none";
   } else {
     userText.innerText = "로그인하지 않음";
