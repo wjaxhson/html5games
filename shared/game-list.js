@@ -19,5 +19,12 @@ export const games = [
     description: "개발 중인 테스트 게임",
     path: "./games/test-game/",
     visible: false
+  },
+  {
+    id: "crystal-miner",
+    title: "Crystal Miner",
+    description: "수정을 채굴하고 자동 채굴기를 구매하는 방치형 클리커 게임",
+    path: "./games/crystal-miner/",
+    visible: true
   }
 ];
