@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>스트루프 테스트</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+:root {
+  --bg: #f5f2eb;
+  --card: #ffffff;
+  --text: #1a1a1a;
+  --muted: #888;
+  --radius: 16px;
+  --shadow: 0 2px 24px rgba(0,0,0,0.08);
+}
+
+body {
+  background: var(--bg);
+  font-family: 'Noto Sans KR', sans-serif;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 16px;
+  overflow: hidden;
+}
+
+/* grain overlay */
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 100;
+  opacity: 0.6;
+}
+
+#app {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ── SCREEN SYSTEM ── */
+.screen { display: none; flex-direction: column; align-items: center; gap: 24px; }
+.screen.active { display: flex; }
+
+/* ── START ── */
+#start-screen {
+  text-align: center;
+  gap: 20px;
+}
+.brand {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+.title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.title-main {
+  font-size: 38px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--text);
+}
+.title-sub {
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+.demo-word {
+  font-size: 52px;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  padding: 28px 40px;
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  line-height: 1;
+}
+.rule-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow);
+  width: 100%;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.rule-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.5;
+}
+.rule-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 1px;
+  font-size: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700;
+  color: white;
+  background: #1a1a1a;
+}
+.btn-start {
+  width: 100%;
+  padding: 18px;
+  background: var(--text);
+  color: var(--bg);
+  border: none;
+  border-radius: var(--radius);
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  transition: transform 0.1s, opacity 0.1s;
+}
+.btn-start:active { transform: scale(0.97); opacity: 0.85; }
+
+/* ── GAME ── */
+#game-screen { gap: 20px; width: 100%; }
+
+.progress-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.progress-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+}
+.progress-dots {
+  display: flex;
+  gap: 6px;
+}
+.pdot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #ddd;
+  transition: background 0.3s;
+}
+.pdot.done   { background: #1a1a1a; }
+.pdot.active { background: #1a1a1a; outline: 2px solid #1a1a1a; outline-offset: 2px; }
+.pdot.fail   { background: #e74c3c; }
+
+.question-card {
+  width: 100%;
+  background: var(--card);
+  border-radius: 24px;
+  box-shadow: var(--shadow);
+  padding: 40px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.q-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+.q-word {
+  font-size: 58px;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  transition: color 0.2s;
+}
+.q-instruction {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.buttons-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.color-btn {
+  padding: 0;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 76px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.12s, box-shadow 0.12s;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+}
+.color-btn:active { transform: scale(0.95); }
+.color-btn.correct {
+  animation: pulse-correct 0.4s ease;
+}
+.color-btn.wrong {
+  animation: shake 0.4s ease;
+}
+@keyframes pulse-correct {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  20%     { transform: translateX(-8px); }
+  60%     { transform: translateX(8px); }
+}
+
+.btn-color-swatch {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.25);
+  border: 2px solid rgba(255,255,255,0.5);
+}
+.btn-color-name {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  letter-spacing: 0.02em;
+}
+
+/* ── RESULT ── */
+#result-screen {
+  text-align: center;
+  gap: 20px;
+  width: 100%;
+}
+.result-card {
+  width: 100%;
+  background: var(--card);
+  border-radius: 24px;
+  box-shadow: var(--shadow);
+  padding: 40px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+.result-emoji { font-size: 56px; line-height: 1; }
+.result-title {
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  color: var(--text);
+}
+.result-sub {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+.result-stats {
+  display: flex;
+  gap: 24px;
+  margin-top: 4px;
+}
+.stat-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.stat-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 28px;
+  font-weight: 500;
+  color: var(--text);
+}
+.stat-lbl {
+  font-size: 11px;
+  color: var(--muted);
+}
+.review-list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+}
+.review-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--bg);
+  border-radius: 12px;
+  font-size: 13px;
+}
+.review-icon { font-size: 14px; flex-shrink: 0; }
+.review-word { font-weight: 700; }
+.review-desc { color: var(--muted); font-size: 12px; margin-left: auto; }
+
+/* ── FEEDBACK OVERLAY ── */
+#feedback {
+  position: fixed; inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 50;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+#feedback.show { opacity: 1; }
+#feedback-inner {
+  font-size: 80px;
+  line-height: 1;
+  filter: drop-shadow(0 4px 16px rgba(0,0,0,0.2));
+}
+
+/* entrance animation */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fadein { animation: fadeUp 0.35s ease both; }
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- START -->
+  <div id="start-screen" class="screen active">
+    <div class="brand">Cognitive Test</div>
+    <div class="title-block">
+      <div class="title-main">스트루프<br>테스트</div>
+      <div class="title-sub">글자 색깔이 뭔지 맞혀보세요</div>
+    </div>
+    <div class="demo-word" id="demo-word" style="color:#e74c3c">파랑</div>
+    <div class="rule-card">
+      <div class="rule-item">
+        <div class="rule-dot">1</div>
+        <span>화면에 색깔 이름이 나타납니다. 단, 글자 색깔과 내용이 다를 수 있어요.</span>
+      </div>
+      <div class="rule-item">
+        <div class="rule-dot">2</div>
+        <span>4개 버튼 중 <strong>글자의 색깔</strong>과 일치하는 버튼을 누르세요.</span>
+      </div>
+      <div class="rule-item">
+        <div class="rule-dot">3</div>
+        <span>5문제 연속 성공하면 클리어! 한 번이라도 틀리면 즉시 탈락.</span>
+      </div>
+    </div>
+    <button class="btn-start" onclick="startGame()">시작하기 →</button>
+  </div>
+
+  <!-- GAME -->
+  <div id="game-screen" class="screen">
+    <div class="progress-row">
+      <div class="progress-label" id="prog-label">1 / 5</div>
+      <div class="progress-dots" id="prog-dots"></div>
+    </div>
+    <div class="question-card fadein" id="question-card">
+      <div class="q-label">글자의 색깔은?</div>
+      <div class="q-word" id="q-word">빨강</div>
+      <div class="q-instruction">글자에 칠해진 색을 고르세요</div>
+    </div>
+    <div class="buttons-grid" id="buttons-grid"></div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result-screen" class="screen">
+    <div class="result-card fadein" id="result-card">
+      <div class="result-emoji" id="result-emoji">🎉</div>
+      <div class="result-title" id="result-title">성공!</div>
+      <div class="result-sub" id="result-sub">5문제 모두 맞혔어요</div>
+      <div class="result-stats" id="result-stats"></div>
+      <div class="review-list" id="review-list"></div>
+    </div>
+    <button class="btn-start" onclick="startGame()">다시하기 →</button>
+  </div>
+
+</div>
+
+<div id="feedback"><div id="feedback-inner"></div></div>
+
+<script>
+// ── 색깔 데이터베이스 (20가지) ──
+const COLORS = [
+  { name: '빨강',   hex: '#e74c3c', complementary: '#3ce7d8' },
+  { name: '파랑',   hex: '#3498db', complementary: '#db9034' },
+  { name: '초록',   hex: '#27ae60', complementary: '#ae2777' },
+  { name: '노랑',   hex: '#f1c40f', complementary: '#0f3ef1' },
+  { name: '주황',   hex: '#e67e22', complementary: '#2281e6' },
+  { name: '보라',   hex: '#9b59b6', complementary: '#59b69b' },
+  { name: '분홍',   hex: '#e91e8c', complementary: '#1ee973' },
+  { name: '하늘',   hex: '#00bcd4', complementary: '#d44300' },
+  { name: '남색',   hex: '#1a237e', complementary: '#7e6d1a' },
+  { name: '연두',   hex: '#8bc34a', complementary: '#7e4ab3' },
+  { name: '갈색',   hex: '#795548', complementary: '#484f79' },
+  { name: '회색',   hex: '#9e9e9e', complementary: '#9e9e9e' },
+  { name: '검정',   hex: '#212121', complementary: '#d4d4d4' },
+  { name: '흰색',   hex: '#bdbdbd', complementary: '#424242' },
+  { name: '금색',   hex: '#ffc107', complementary: '#070ec1' },
+  { name: '은색',   hex: '#90a4ae', complementary: '#a45b46' },
+  { name: '자주',   hex: '#880e4f', complementary: '#0e884b' },
+  { name: '청록',   hex: '#009688', complementary: '#960016' },
+  { name: '연보라', hex: '#ce93d8', complementary: '#93d8c9' },
+  { name: '살구',   hex: '#ffab76', complementary: '#76c0ff' },
+];
+
+// 비슷한 색 매핑 (hue 인접)
+const SIMILAR = {
+  '빨강':   ['주황','자주','분홍'],
+  '파랑':   ['하늘','남색','청록'],
+  '초록':   ['연두','청록','하늘'],
+  '노랑':   ['금색','연두','살구'],
+  '주황':   ['빨강','살구','금색'],
+  '보라':   ['자주','연보라','남색'],
+  '분홍':   ['빨강','연보라','살구'],
+  '하늘':   ['파랑','청록','은색'],
+  '남색':   ['파랑','보라','자주'],
+  '연두':   ['초록','노랑','금색'],
+  '갈색':   ['살구','주황','금색'],
+  '회색':   ['은색','검정','흰색'],
+  '검정':   ['회색','남색','갈색'],
+  '흰색':   ['회색','은색','연보라'],
+  '금색':   ['노랑','살구','주황'],
+  '은색':   ['회색','흰색','하늘'],
+  '자주':   ['빨강','보라','분홍'],
+  '청록':   ['초록','하늘','파랑'],
+  '연보라': ['보라','분홍','은색'],
+  '살구':   ['주황','분홍','금색'],
+};
+
+let questions = [];
+let current   = 0;
+let history   = []; // {word, inkColor, textColor, chosen, correct}
+let startTime = 0;
+let blocked   = false;
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function pick(arr, n) { return shuffle(arr).slice(0, n); }
+
+function colorByName(name) { return COLORS.find(c => c.name === name); }
+
+function buildQuestion() {
+  // 글자 내용 (textColor): 임의 색
+  const allNames = COLORS.map(c => c.name);
+  const textColorName = allNames[Math.floor(Math.random() * allNames.length)];
+  const textColor = colorByName(textColorName);
+
+  // 잉크 색 (inkColor): 50% 확률로 다른 색
+  let inkColor;
+  const forceConflict = Math.random() < 0.75;
+  if (forceConflict) {
+    const others = COLORS.filter(c => c.name !== textColorName);
+    inkColor = others[Math.floor(Math.random() * others.length)];
+  } else {
+    inkColor = textColor;
+  }
+
+  // 정답: inkColor
+  const correct = inkColor;
+
+  // 보색
+  const complementHex = inkColor.complementary;
+  // 가장 가까운 색 이름 찾기 (보색)
+  let compColor = COLORS.reduce((best, c) => {
+    if (c.name === correct.name) return best;
+    return hexDist(c.hex, complementHex) < hexDist(best.hex, complementHex) ? c : best;
+  }, COLORS.find(c => c.name !== correct.name));
+
+  // 비슷한 색
+  const similarNames = (SIMILAR[correct.name] || []).filter(n => n !== correct.name);
+  const similarPool  = COLORS.filter(c => similarNames.includes(c.name));
+  let similarColor   = similarPool.length > 0
+    ? similarPool[Math.floor(Math.random() * similarPool.length)]
+    : COLORS.find(c => c.name !== correct.name && c.name !== compColor.name);
+
+  // 글자에 적힌 색 (만약 잉크색과 같으면 다른 것)
+  let textAsColor = textColor;
+  if (textAsColor.name === correct.name) {
+    const others = COLORS.filter(c => c.name !== correct.name && c.name !== compColor.name && c.name !== similarColor.name);
+    textAsColor = others[Math.floor(Math.random() * others.length)];
+  }
+
+  // 4개 옵션 중복 제거
+  const pool = [correct, compColor, similarColor, textAsColor];
+  const seen = new Set();
+  const opts = [];
+  for (const c of pool) {
+    if (!seen.has(c.name)) { seen.add(c.name); opts.push(c); }
+  }
+  // 부족하면 채우기
+  for (const c of shuffle(COLORS)) {
+    if (opts.length >= 4) break;
+    if (!seen.has(c.name)) { seen.add(c.name); opts.push(c); }
+  }
+
+  return {
+    word:      textColorName,
+    inkColor:  inkColor,
+    textColor: textColor,
+    options:   shuffle(opts.slice(0, 4)),
+  };
+}
+
+function hexDist(h1, h2) {
+  const r1 = parseInt(h1.slice(1,3),16), g1 = parseInt(h1.slice(3,5),16), b1 = parseInt(h1.slice(5,7),16);
+  const r2 = parseInt(h2.slice(1,3),16), g2 = parseInt(h2.slice(3,5),16), b2 = parseInt(h2.slice(5,7),16);
+  return Math.abs(r1-r2) + Math.abs(g1-g2) + Math.abs(b1-b2);
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function startGame() {
+  questions = Array.from({length: 5}, buildQuestion);
+  current   = 0;
+  history   = [];
+  startTime = Date.now();
+  blocked   = false;
+  showScreen('game-screen');
+  renderQuestion();
+}
+
+function renderDots() {
+  const container = document.getElementById('prog-dots');
+  container.innerHTML = '';
+  for (let i = 0; i < 5; i++) {
+    const d = document.createElement('div');
+    d.className = 'pdot';
+    if (i < current)        d.classList.add('done');
+    else if (i === current) d.classList.add('active');
+    container.appendChild(d);
+  }
+  document.getElementById('prog-label').textContent = (current + 1) + ' / 5';
+}
+
+function renderQuestion() {
+  blocked = false;
+  const q = questions[current];
+
+  // progress
+  renderDots();
+
+  // word
+  const wordEl = document.getElementById('q-word');
+  wordEl.textContent = q.word;
+  wordEl.style.color = q.inkColor.hex;
+
+  // card entrance
+  const card = document.getElementById('question-card');
+  card.classList.remove('fadein');
+  void card.offsetWidth;
+  card.classList.add('fadein');
+
+  // buttons
+  const grid = document.getElementById('buttons-grid');
+  grid.innerHTML = '';
+  q.options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'color-btn';
+    btn.style.background = opt.hex;
+
+    const swatch = document.createElement('div');
+    swatch.className = 'btn-color-swatch';
+    swatch.style.background = 'rgba(255,255,255,0.22)';
+
+    const label = document.createElement('div');
+    label.className = 'btn-color-name';
+    label.textContent = opt.name;
+
+    btn.appendChild(swatch);
+    btn.appendChild(label);
+    btn.addEventListener('click', () => handleAnswer(opt, btn));
+    grid.appendChild(btn);
+  });
+}
+
+function showFeedback(ok) {
+  const fb = document.getElementById('feedback');
+  document.getElementById('feedback-inner').textContent = ok ? '✓' : '✗';
+  fb.style.color = ok ? '#27ae60' : '#e74c3c';
+  fb.classList.add('show');
+  setTimeout(() => fb.classList.remove('show'), 500);
+}
+
+function handleAnswer(chosen, btn) {
+  if (blocked) return;
+  blocked = true;
+
+  const q = questions[current];
+  const ok = chosen.name === q.inkColor.name;
+
+  history.push({ q, chosen, ok });
+
+  btn.classList.add(ok ? 'correct' : 'wrong');
+  showFeedback(ok);
+
+  if (!ok) {
+    // 실패
+    setTimeout(() => markDotFail(), 250);
+    setTimeout(() => showResult(false), 800);
+    return;
+  }
+
+  current++;
+  if (current >= 5) {
+    setTimeout(() => showResult(true), 600);
+  } else {
+    setTimeout(() => renderQuestion(), 480);
+  }
+}
+
+function markDotFail() {
+  const dots = document.querySelectorAll('.pdot');
+  if (dots[current]) {
+    dots[current].classList.remove('active');
+    dots[current].classList.add('fail');
+  }
+}
+
+function showResult(success) {
+  const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+  const correct = history.filter(h => h.ok).length;
+
+  document.getElementById('result-emoji').textContent = success ? '🎉' : '😵';
+  document.getElementById('result-title').textContent = success ? '성공!' : '탈락!';
+  document.getElementById('result-sub').textContent   = success
+    ? '5문제 모두 맞혔어요! 대단한 집중력이에요.'
+    : `${correct}문제 만에 탈락했어요.`;
+
+  document.getElementById('result-stats').innerHTML = `
+    <div class="stat-box">
+      <div class="stat-num">${correct}<span style="font-size:16px;color:var(--muted)">/5</span></div>
+      <div class="stat-lbl">정답</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num">${elapsed}<span style="font-size:16px;color:var(--muted)">s</span></div>
+      <div class="stat-lbl">소요시간</div>
+    </div>
+  `;
+
+  const reviewEl = document.getElementById('review-list');
+  reviewEl.innerHTML = '';
+  history.forEach((h, i) => {
+    const item = document.createElement('div');
+    item.className = 'review-item';
+    const conflict = h.q.word !== h.q.inkColor.name;
+    item.innerHTML = `
+      <span class="review-icon">${h.ok ? '✅' : '❌'}</span>
+      <span class="review-word" style="color:${h.q.inkColor.hex}">${h.q.word}</span>
+      <span class="review-desc">${h.ok ? '정답' : '오답 → ' + h.chosen.name}</span>
+    `;
+    reviewEl.appendChild(item);
+  });
+
+  showScreen('result-screen');
+  document.getElementById('result-card').classList.remove('fadein');
+  void document.getElementById('result-card').offsetWidth;
+  document.getElementById('result-card').classList.add('fadein');
+}
+
+// 데모 단어 반짝이기
+const demoColors = COLORS.map(c => c.hex);
+let di = 0;
+setInterval(() => {
+  di = (di + 1) % demoColors.length;
+  const d = document.getElementById('demo-word');
+  if (d) d.style.color = demoColors[di];
+}, 1200);
+</script>
+</body>
+</html>
