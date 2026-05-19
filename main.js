@@ -40,6 +40,7 @@ games
       <a href="${gamePath}" class="game-card">
         <img
           src="${thumbnailPath}"
+          onerror="this.src='./shared/default-thumbnail.png'"
           alt="${game.title}"
           class="game-thumbnail"
         >
