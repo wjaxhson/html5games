@@ -1,0 +1,102 @@
+/* =========================
+   Game Page Layout
+========================= */
+
+.game-page {
+  min-height: 100dvh;
+  padding: 16px;
+
+  display: flex;
+  justify-content: center;
+
+  background: #121212;
+  color: #f5f5f5;
+}
+
+.game-container {
+  width: 100%;
+  max-width: 720px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.game-title {
+  margin: 0;
+  font-size: 24px;
+}
+
+.game-back-link {
+  color: #93c5fd;
+  font-size: 14px;
+}
+
+.game-panel {
+  padding: 16px;
+
+  border: 1px solid #2a2a2a;
+  border-radius: 14px;
+
+  background: #1b1b1b;
+}
+
+.game-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.game-status {
+  color: #bdbdbd;
+  font-size: 14px;
+}
+
+.game-canvas-wrap {
+  width: 100%;
+  overflow: hidden;
+
+  border-radius: 14px;
+  background: #000;
+}
+
+.game-canvas-wrap canvas {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* =========================
+   Mobile
+========================= */
+
+@media (max-width: 768px) {
+  .game-page {
+    padding: 12px;
+  }
+
+  .game-title {
+    font-size: 20px;
+  }
+
+  .game-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .game-panel {
+    padding: 14px;
+  }
+
+  .game-actions button {
+    flex: 1;
+    min-width: 120px;
+  }
+}
