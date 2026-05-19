@@ -1,0 +1,442 @@
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const container = document.getElementById('canvasContainer');
+
+// ── 레벨 설정 ──────────────────────────────────────────
+const LEVELS = [
+  { name:'LV.1 — 쉬움',   tolerance:24, curves:2, speed:1.0 },
+  { name:'LV.2 — 보통',   tolerance:15, curves:3, speed:1.0 },
+  { name:'LV.3 — 어려움', tolerance:9,  curves:5, speed:1.0 },
+];
+
+let currentLevel = 0;
+let TOLERANCE = LEVELS[0].tolerance;
+
+// ── 게임 상태 ──────────────────────────────────────────
+let state = 'idle'; // idle | playing | result
+let pathPoints = [];    // 가이드 경로 (canvas 좌표)
+let isDrawing = false;
+let drawSamples = [];   // 사용자 그린 점
+let accuracy = 0;
+let offTrackCount = 0;
+let offTrack = false;
+let timerInterval = null;
+let timeLeft = 10;
+let startTime = 0;
+let score = 0;
+let stage = 1;
+let progressRatio = 0; // 0~1, 경로를 어디까지 그렸는지
+
+// ── 캔버스 크기 조정 ──────────────────────────────────
+function resizeCanvas() {
+  const rect = container.getBoundingClientRect();
+  canvas.width  = rect.width;
+  canvas.height = rect.height;
+  if (state === 'playing') drawGuide();
+}
+
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+// ── 경로 생성 (베지어 커브 기반) ──────────────────────
+function generatePath(numCurves) {
+  const W = canvas.width;
+  const H = canvas.height;
+  const margin = W * 0.12;
+  const pts = [];
+
+  // 시작점
+  pts.push({ x: margin + Math.random() * W * 0.15, y: margin + Math.random() * H * 0.1 });
+
+  for (let i = 0; i < numCurves; i++) {
+    const t = (i + 1) / (numCurves + 1);
+    pts.push({
+      x: margin + Math.random() * (W - margin * 2),
+      y: margin + t * (H - margin * 2) + (Math.random() - 0.5) * H * 0.12
+    });
+  }
+
+  // 끝점
+  pts.push({ x: W - margin - Math.random() * W * 0.15, y: H - margin - Math.random() * H * 0.1 });
+
+  // 베지어 샘플링 → pathPoints
+  const result = [];
+  const SAMPLES = 300;
+  for (let s = 0; s <= SAMPLES; s++) {
+    const t = s / SAMPLES;
+    result.push(catmullRom(pts, t));
+  }
+  return result;
+}
+
+function catmullRom(pts, t) {
+  const n = pts.length - 1;
+  const scaled = t * n;
+  const i = Math.min(Math.floor(scaled), n - 1);
+  const local = scaled - i;
+
+  const p0 = pts[Math.max(i - 1, 0)];
+  const p1 = pts[i];
+  const p2 = pts[Math.min(i + 1, n)];
+  const p3 = pts[Math.min(i + 2, n)];
+
+  const t2 = local * local;
+  const t3 = t2 * local;
+
+  return {
+    x: 0.5 * ((2*p1.x) + (-p0.x+p2.x)*local + (2*p0.x-5*p1.x+4*p2.x-p3.x)*t2 + (-p0.x+3*p1.x-3*p2.x+p3.x)*t3),
+    y: 0.5 * ((2*p1.y) + (-p0.y+p2.y)*local + (2*p0.y-5*p1.y+4*p2.y-p3.y)*t2 + (-p0.y+3*p1.y-3*p2.y+p3.y)*t3)
+  };
+}
+
+// ── 그리기 ─────────────────────────────────────────────
+function drawGuide() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (!pathPoints.length) return;
+
+  const tol = TOLERANCE;
+
+  // 허용 영역 (반투명 띠)
+  ctx.beginPath();
+  // 상단 경계
+  for (let i = 0; i < pathPoints.length; i++) {
+    const ang = getNormal(i);
+    const p = pathPoints[i];
+    const nx = -Math.sin(ang) * tol;
+    const ny =  Math.cos(ang) * tol;
+    if (i === 0) ctx.moveTo(p.x + nx, p.y + ny);
+    else ctx.lineTo(p.x + nx, p.y + ny);
+  }
+  // 하단 경계 (역순)
+  for (let i = pathPoints.length - 1; i >= 0; i--) {
+    const ang = getNormal(i);
+    const p = pathPoints[i];
+    const nx = Math.sin(ang) * tol;
+    const ny = -Math.cos(ang) * tol;
+    ctx.lineTo(p.x + nx, p.y + ny);
+  }
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(200,191,168,0.35)';
+  ctx.fill();
+
+  // 가이드 선 (점선)
+  ctx.beginPath();
+  pathPoints.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+  ctx.setLineDash([8, 6]);
+  ctx.lineWidth = 2.5;
+  ctx.strokeStyle = '#b0a490';
+  ctx.lineCap = 'round';
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // 시작점
+  const sp = pathPoints[0];
+  ctx.beginPath();
+  ctx.arc(sp.x, sp.y, 10, 0, Math.PI * 2);
+  ctx.fillStyle = '#2d8a4e';
+  ctx.fill();
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // 시작 레이블
+  ctx.font = 'bold 11px "Noto Sans KR"';
+  ctx.fillStyle = '#2d8a4e';
+  ctx.textAlign = 'center';
+  ctx.fillText('START', sp.x, sp.y - 16);
+
+  // 끝점 (별)
+  const ep = pathPoints[pathPoints.length - 1];
+  drawStar(ep.x, ep.y, 13, '#e8c22a', '#fff');
+  ctx.font = 'bold 11px "Noto Sans KR"';
+  ctx.fillStyle = '#c8a010';
+  ctx.textAlign = 'center';
+  ctx.fillText('END', ep.x, ep.y + 24);
+
+  // 사용자 선 그리기
+  if (drawSamples.length > 1) {
+    ctx.beginPath();
+    drawSamples.forEach((p, i) => {
+      if (p.off) {
+        ctx.strokeStyle = 'rgba(192,57,43,0.7)';
+      } else {
+        ctx.strokeStyle = 'rgba(29,111,212,0.8)';
+      }
+      if (i === 0) ctx.moveTo(p.x, p.y);
+      else {
+        // 색 변경 시 획 나눔
+        ctx.lineTo(p.x, p.y);
+        ctx.lineWidth = 3.5;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+      }
+    });
+  }
+}
+
+function drawStar(cx, cy, r, fill, stroke) {
+  ctx.beginPath();
+  for (let i = 0; i < 5; i++) {
+    const outerA = (Math.PI * 2 * i / 5) - Math.PI / 2;
+    const innerA = outerA + Math.PI / 5;
+    if (i === 0) ctx.moveTo(cx + Math.cos(outerA)*r, cy + Math.sin(outerA)*r);
+    else ctx.lineTo(cx + Math.cos(outerA)*r, cy + Math.sin(outerA)*r);
+    ctx.lineTo(cx + Math.cos(innerA)*(r*0.42), cy + Math.sin(innerA)*(r*0.42));
+  }
+  ctx.closePath();
+  ctx.fillStyle = fill;
+  ctx.fill();
+  ctx.strokeStyle = stroke;
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+}
+
+function getNormal(i) {
+  const a = pathPoints[Math.max(0, i-1)];
+  const b = pathPoints[Math.min(pathPoints.length-1, i+1)];
+  return Math.atan2(b.y - a.y, b.x - a.x);
+}
+
+// ── 경로 상 가장 가까운 점 찾기 ───────────────────────
+function closestOnPath(px, py) {
+  let minDist = Infinity, minIdx = 0;
+  for (let i = 0; i < pathPoints.length; i++) {
+    const dx = pathPoints[i].x - px;
+    const dy = pathPoints[i].y - py;
+    const d = dx*dx + dy*dy;
+    if (d < minDist) { minDist = d; minIdx = i; }
+  }
+  return { idx: minIdx, dist: Math.sqrt(minDist) };
+}
+
+// ── 포인트 계산 ────────────────────────────────────────
+function calcPoints(acc, offCount, timeUsed) {
+  if (acc < 60) return 0;
+  let base = Math.round(acc * 0.8);
+  base -= offCount * 5;
+  if (timeUsed < 5) base += 20;
+  else if (timeUsed < 8) base += 10;
+  return Math.max(0, Math.min(100, base));
+}
+
+// ── 타이머 ────────────────────────────────────────────
+function startTimer() {
+  timeLeft = 10;
+  const fillEl = document.getElementById('timerFill');
+  const dispEl = document.getElementById('timerDisplay');
+  fillEl.style.width = '100%';
+  fillEl.style.background = '#2d8a4e';
+
+  timerInterval = setInterval(() => {
+    timeLeft -= 0.1;
+    const pct = Math.max(0, timeLeft / 10 * 100);
+    fillEl.style.width = pct + '%';
+    dispEl.textContent = Math.ceil(timeLeft);
+
+    if (timeLeft <= 3) {
+      fillEl.style.background = '#c0392b';
+      dispEl.classList.add('danger');
+    } else if (timeLeft <= 6) {
+      fillEl.style.background = '#e8a020';
+    }
+
+    if (timeLeft <= 0) {
+      endGame(false, 'time');
+    }
+  }, 100);
+}
+
+// ── 게임 시작 ─────────────────────────────────────────
+function startGame() {
+  state = 'playing';
+  score = 0;
+  stage = 1;
+  offTrackCount = 0;
+  drawSamples = [];
+  isDrawing = false;
+  accuracy = 0;
+  progressRatio = 0;
+
+  document.getElementById('startOverlay').classList.add('hidden');
+  document.getElementById('resultOverlay').classList.add('hidden');
+  document.getElementById('scoreDisplay').textContent = '0';
+  document.getElementById('stageDisplay').textContent = '1';
+  document.getElementById('accFill').style.width = '0%';
+  document.getElementById('accValue').textContent = '—';
+  document.getElementById('timerDisplay').classList.remove('danger');
+
+  const lv = LEVELS[currentLevel];
+  TOLERANCE = lv.tolerance;
+  document.getElementById('levelLabel').textContent = lv.name;
+
+  resizeCanvas();
+  pathPoints = generatePath(lv.curves);
+  startTime = Date.now();
+  startTimer();
+  drawGuide();
+}
+
+// ── 게임 종료 ─────────────────────────────────────────
+function endGame(success, reason) {
+  clearInterval(timerInterval);
+  state = 'result';
+
+  const timeUsed = Math.min(10, (Date.now() - startTime) / 1000);
+  const finalAcc = Math.round(accuracy * 10) / 10;
+  const pts = success ? calcPoints(finalAcc, offTrackCount, timeUsed) : 0;
+
+  document.getElementById('resultIcon').textContent  = success ? '🎉' : (reason==='time'?'⏰':'😅');
+  document.getElementById('resultTitle').textContent = success ? '성공!' : (reason==='time'?'시간 초과':'실패');
+  document.getElementById('resultScore').textContent = finalAcc + '%';
+  document.getElementById('resTime').textContent     = timeUsed.toFixed(1) + 's';
+  document.getElementById('resOff').textContent      = offTrackCount;
+  document.getElementById('resStage').textContent    = stage;
+
+  if (pts > 0) {
+    document.getElementById('pointBadge').textContent = `🪙 +${pts} 포인트 지급!`;
+    document.getElementById('pointBadge').style.background = '#d4a017';
+  } else {
+    document.getElementById('pointBadge').textContent = '포인트 미지급 (정확도 60% 이상 필요)';
+    document.getElementById('pointBadge').style.background = '#888';
+  }
+
+  document.getElementById('resultOverlay').classList.remove('hidden');
+
+  if (success) spawnParticles();
+}
+
+// ── 파티클 ────────────────────────────────────────────
+function spawnParticles() {
+  const colors = ['#e8c22a','#2d8a4e','#1a6fd4','#e85a2a','#c055d4'];
+  const rect = container.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 3;
+
+  for (let i = 0; i < 30; i++) {
+    const el = document.createElement('div');
+    el.className = 'particle';
+    const angle = (Math.random() * Math.PI * 2);
+    const dist  = 60 + Math.random() * 140;
+    el.style.cssText = `
+      left:${cx}px; top:${cy}px;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      --tx:${Math.cos(angle)*dist}px;
+      --ty:${Math.sin(angle)*dist}px;
+      animation-delay:${Math.random()*0.3}s;
+      animation-duration:${0.6+Math.random()*0.4}s;
+    `;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 1200);
+  }
+}
+
+// ── 터치/마우스 이벤트 ────────────────────────────────
+function getPos(e) {
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  const src = e.touches ? e.touches[0] : e;
+  return {
+    x: (src.clientX - rect.left) * scaleX,
+    y: (src.clientY - rect.top)  * scaleY
+  };
+}
+
+function onStart(e) {
+  if (state !== 'playing') return;
+  e.preventDefault();
+
+  const pos = getPos(e);
+  const sp  = pathPoints[0];
+  const dist = Math.hypot(pos.x - sp.x, pos.y - sp.y);
+
+  // 시작점 근처에서만 그리기 시작 허용
+  if (dist > TOLERANCE * 2.5) {
+    document.getElementById('hintText').textContent = '🟢 시작점(●)에서 시작하세요!';
+    container.classList.add('shake');
+    setTimeout(() => container.classList.remove('shake'), 300);
+    return;
+  }
+
+  document.getElementById('hintText').textContent = '선을 따라 끝점까지 그으세요';
+  isDrawing = true;
+  drawSamples = [{ ...pos, off: false }];
+  offTrackCount = 0;
+  offTrack = false;
+  drawGuide();
+}
+
+function onMove(e) {
+  if (!isDrawing || state !== 'playing') return;
+  e.preventDefault();
+
+  const pos = getPos(e);
+  const { idx, dist } = closestOnPath(pos.x, pos.y);
+  const isOff = dist > TOLERANCE;
+
+  // 이탈 카운팅 (새로운 이탈 감지)
+  if (isOff && !offTrack) {
+    offTrackCount++;
+    offTrack = true;
+    if (navigator.vibrate) navigator.vibrate(60);
+  } else if (!isOff) {
+    offTrack = false;
+  }
+
+  drawSamples.push({ ...pos, off: isOff });
+
+  // 진행률
+  progressRatio = idx / (pathPoints.length - 1);
+
+  // 실시간 정확도 계산
+  const onTrackCount = drawSamples.filter(s => !s.off).length;
+  accuracy = drawSamples.length > 0 ? (onTrackCount / drawSamples.length) * 100 : 0;
+
+  // UI 업데이트
+  const accPct = Math.round(accuracy);
+  document.getElementById('accFill').style.width = accPct + '%';
+  document.getElementById('accFill').style.background = accPct >= 75 ? '#2d8a4e' : accPct >= 50 ? '#e8a020' : '#c0392b';
+  document.getElementById('accValue').textContent = accPct + '%';
+
+  drawGuide();
+
+  // 끝점 도달 체크
+  const ep = pathPoints[pathPoints.length - 1];
+  const endDist = Math.hypot(pos.x - ep.x, pos.y - ep.y);
+  if (endDist < TOLERANCE * 2 && progressRatio > 0.85) {
+    endGame(accuracy >= 60, 'complete');
+  }
+}
+
+function onEnd(e) {
+  if (!isDrawing) return;
+  isDrawing = false;
+  if (state !== 'playing') return;
+  // 끝점 미도달 시 처리 — 그냥 계속 대기
+}
+
+canvas.addEventListener('touchstart',  onStart, { passive: false });
+canvas.addEventListener('touchmove',   onMove,  { passive: false });
+canvas.addEventListener('touchend',    onEnd,   { passive: false });
+canvas.addEventListener('mousedown',   onStart);
+canvas.addEventListener('mousemove',   onMove);
+canvas.addEventListener('mouseup',     onEnd);
+
+// ── 버튼 ──────────────────────────────────────────────
+document.getElementById('startBtn').addEventListener('click', startGame);
+document.getElementById('retryBtn').addEventListener('click', () => {
+  document.getElementById('resultOverlay').classList.add('hidden');
+  document.getElementById('startOverlay').classList.remove('hidden');
+});
+
+// 레벨 버튼
+document.querySelectorAll('.lv-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.lv-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentLevel = parseInt(btn.dataset.lv);
+  });
+});
