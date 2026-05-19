@@ -1,4 +1,5 @@
 import { createSaveManager } from "../../shared/save.js";
+import { createSaveUI } from "../../shared/save-ui.js";
 
 const GAME_ID = "crystal-miner";
 
@@ -9,8 +10,8 @@ const minerCountTextEl = document.getElementById("minerCountText");
 const minerCostTextEl = document.getElementById("minerCostText");
 const mineButton = document.getElementById("mineButton");
 const buyMinerButton = document.getElementById("buyMinerButton");
-const saveButton = document.getElementById("saveButton");
 const statusEl = document.getElementById("status");
+const saveUiRootEl = document.getElementById("save-ui");
 
 let crystals = 0;
 let minerCount = 0;
@@ -71,8 +72,12 @@ buyMinerButton.addEventListener("click", () => {
   render();
 });
 
-saveButton.addEventListener("click", async () => {
-  await saveManager.save();
+createSaveUI({
+  root: saveUiRootEl,
+  autoSaveSeconds: 30,
+  onSave: async () => {
+    await saveManager.save();
+  },
 });
 
 setInterval(() => {
