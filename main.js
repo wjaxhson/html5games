@@ -33,9 +33,22 @@ games
   .forEach((game) => {
     const li = document.createElement("li");
 
+    const gamePath = `./games/${game.id}/`;
+    const thumbnailPath = `./games/${game.id}/thumbnail.png`;
+
     li.innerHTML = `
-      <a href="${game.path}">${game.title}</a>
-      <p>${game.description}</p>
+      <a href="${gamePath}" class="game-card">
+        <img
+          src="${thumbnailPath}"
+          alt="${game.title}"
+          class="game-thumbnail"
+        >
+
+        <div class="game-info">
+          <h3>${game.title}</h3>
+          <p>${game.description}</p>
+        </div>
+      </a>
     `;
 
     gameListEl.appendChild(li);
