@@ -1,227 +1,76 @@
-import {
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { createSaveManager } from "../../shared/save.js";
 
-import {
-  doc,
-  setDoc,
-  getDoc
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const GAME_ID = "upgrade-clicker";
 
-import {
-  auth,
-  db
-} from "../../shared/firebase.js";
+const loginStatusEl = document.getElementById("loginStatus");
+const scoreTextEl = document.getElementById("scoreText");
+const powerTextEl = document.getElementById("powerText");
+const upgradeTextEl = document.getElementById("upgradeText");
+const clickButton = document.getElementById("clickButton");
+const upgradeButton = document.getElementById("upgradeButton");
+const saveButton = document.getElementById("saveButton");
+const statusEl = document.getElementById("status");
 
-const GAME_ID = "crystal-miner";
-const LOCAL_SAVE_KEY =
-  `html5games:${GAME_ID}:save`;
+let score = 0;
+let clickPower = 1;
+let upgradeLevel = 0;
 
-const crystalText =
-  document.getElementById("crystalText");
-
-const perSecondText =
-  document.getElementById("perSecondText");
-
-const minerCountText =
-  document.getElementById("minerCountText");
-
-const minerCostText =
-  document.getElementById("minerCostText");
-
-const mineButton =
-  document.getElementById("mineButton");
-
-const buyMinerButton =
-  document.getElementById("buyMinerButton");
-
-const saveButton =
-  document.getElementById("saveButton");
-
-const statusEl =
-  document.getElementById("status");
-
-const loginStatusEl =
-  document.getElementById("loginStatus");
-
-let currentUser = null;
-
-let crystals = 0;
-let minerCount = 0;
-
-let autoSaveRemaining = 30;
-
-function getMinerCost() {
-  return Math.floor(
-    10 * Math.pow(1.35, minerCount)
-  );
-}
-
-function getPerSecond() {
-  return minerCount;
+function getUpgradeCost() {
+  return 10 + upgradeLevel * 15;
 }
 
 function render() {
-  crystalText.innerText =
-    Math.floor(crystals);
-
-  perSecondText.innerText =
-    getPerSecond();
-
-  minerCountText.innerText =
-    minerCount;
-
-  minerCostText.innerText =
-    getMinerCost();
+  scoreTextEl.innerText = `점수: ${score}`;
+  powerTextEl.innerText = `클릭 파워: ${clickPower}`;
+  upgradeTextEl.innerText = `업그레이드 비용: ${getUpgradeCost()}`;
 }
 
-function updateAutoSaveText() {
-  const saveType =
-    currentUser ? "서버" : "로컬";
+const saveManager = createSaveManager({
+  gameId: GAME_ID,
+  statusEl,
+  loginStatusEl,
 
-  statusEl.innerText =
-    `${saveType} 자동 저장까지 ${autoSaveRemaining}초`;
-}
+  getSaveData() {
+    return {
+      score,
+      clickPower,
+      upgradeLevel
+    };
+  },
 
-function getSaveData() {
-  return {
-    crystals,
-    minerCount,
-    updatedAt: Date.now()
-  };
-}
+  applySaveData(data) {
+    score = data.score ?? 0;
+    clickPower = data.clickPower ?? 1;
+    upgradeLevel = data.upgradeLevel ?? 0;
+  },
 
-async function saveGame() {
-  const saveData = getSaveData();
-
-  if (currentUser) {
-    await setDoc(
-      doc(
-        db,
-        "users",
-        currentUser.uid,
-        "games",
-        GAME_ID
-      ),
-      saveData
-    );
-  } else {
-    localStorage.setItem(
-      LOCAL_SAVE_KEY,
-      JSON.stringify(saveData)
-    );
-  }
-
-  autoSaveRemaining = 30;
-  updateAutoSaveText();
-}
-
-async function loadGame() {
-  if (currentUser) {
-    const docSnap = await getDoc(
-      doc(
-        db,
-        "users",
-        currentUser.uid,
-        "games",
-        GAME_ID
-      )
-    );
-
-    if (docSnap.exists()) {
-      const data = docSnap.data();
-
-      crystals =
-        data.crystals ?? 0;
-
-      minerCount =
-        data.minerCount ?? 0;
-    }
-  } else {
-    const rawData =
-      localStorage.getItem(
-        LOCAL_SAVE_KEY
-      );
-
-    if (rawData) {
-      const data =
-        JSON.parse(rawData);
-
-      crystals =
-        data.crystals ?? 0;
-
-      minerCount =
-        data.minerCount ?? 0;
-    }
-  }
-
-  render();
-}
-
-mineButton.addEventListener(
-  "click",
-  () => {
-    crystals += 1;
+  afterLoad() {
     render();
   }
-);
+});
 
-buyMinerButton.addEventListener(
-  "click",
-  () => {
-    const cost =
-      getMinerCost();
+clickButton.addEventListener("click", () => {
+  score += clickPower;
+  render();
+});
 
-    if (crystals < cost) {
-      return;
-    }
+upgradeButton.addEventListener("click", () => {
+  const cost = getUpgradeCost();
 
-    crystals -= cost;
-    minerCount += 1;
-
-    render();
+  if (score < cost) {
+    alert("점수가 부족합니다.");
+    return;
   }
-);
 
-saveButton.addEventListener(
-  "click",
-  async () => {
-    await saveGame();
-  }
-);
-
-onAuthStateChanged(
-  auth,
-  async (user) => {
-    currentUser = user;
-
-    if (user) {
-      loginStatusEl.innerText =
-        `${user.displayName} 로그인 중`;
-    } else {
-      loginStatusEl.innerText =
-        "비로그인 상태";
-    }
-
-    await loadGame();
-  }
-);
-
-setInterval(() => {
-  crystals += getPerSecond();
+  score -= cost;
+  upgradeLevel += 1;
+  clickPower += 1;
 
   render();
-}, 1000);
+});
 
-setInterval(async () => {
-  autoSaveRemaining--;
-
-  if (autoSaveRemaining <= 0) {
-    await saveGame();
-  }
-
-  updateAutoSaveText();
-}, 1000);
+saveButton.addEventListener("click", async () => {
+  await saveManager.save();
+});
 
 render();
-updateAutoSaveText();
