@@ -2,7 +2,8 @@ export const gameFolders = [
   "simple-clicker",
   "upgrade-clicker",
   "test-game",
-  "crystal-miner"
+  "crystal-miner",
+  "trace-the-line"
 ];
 
 export async function loadGames() {
