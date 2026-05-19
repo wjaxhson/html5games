@@ -1,48 +1,64 @@
 .save-ui {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   flex-wrap: wrap;
-  margin: 12px 0;
+  margin: 16px 0 0;
   font-size: 14px;
-  color: #444;
 }
 
 .save-ui__status {
-  padding: 6px 10px;
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 6px 12px;
   border-radius: 999px;
-  background: #f1f3f5;
+  background: #2a2a2a;
+  color: #d1d5db;
+  font-weight: 600;
 }
 
 .save-ui__status.is-saved {
-  background: #e7f5ff;
-  color: #1971c2;
+  background: #064e3b;
+  color: #a7f3d0;
 }
 
 .save-ui__status.is-saving {
-  background: #fff3bf;
-  color: #e67700;
+  background: #78350f;
+  color: #fde68a;
 }
 
 .save-ui__status.is-error {
-  background: #ffe3e3;
-  color: #c92a2a;
+  background: #7f1d1d;
+  color: #fecaca;
 }
 
 .save-ui__timer {
-  color: #666;
+  color: #bdbdbd;
+  font-size: 13px;
 }
 
 .save-ui__button {
-  border: 0;
-  border-radius: 8px;
-  padding: 7px 12px;
-  background: #228be6;
-  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 8px 14px;
+  background: #4b5563;
+  color: #ffffff;
   cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.save-ui__button:hover {
+  background: #374151;
+}
+
+.save-ui__button:active {
+  transform: scale(0.98);
 }
 
 .save-ui__button:disabled {
-  opacity: 0.5;
+  opacity: 0.55;
   cursor: not-allowed;
 }
