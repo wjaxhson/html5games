@@ -149,10 +149,4 @@ onerror="this.onerror=null; this.src='./assets/default-thumbnail.png';"
 
 ## 다음 작업 우선순위
 
-1. 실제 배포 테스트
-2. 로그인 저장/불러오기 테스트
-3. 비로그인 localStorage 테스트
-4. 모바일 화면 테스트
-5. shared/default-thumbnail.png 추가
-6. 게임별 thumbnail.png 추가
-7. 새 게임 추가
+1. 새 게임 추가
