@@ -379,6 +379,18 @@
   }
 
   .shake { animation: shake 0.3s ease; }
+
+  .back-link {
+    align-self: flex-start;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 13px;
+    padding: 4px 2px;
+  }
+  
+  .back-link:hover {
+    color: var(--text);
+  }
 </style>
 </head>
 <body>
@@ -456,6 +468,8 @@
 </div>
 
 <div class="hint" id="hintText">시작점(●)에 손가락을 대고 끝점(★)까지 선을 따라 그으세요</div>
+
+<a href="../../index.html" class="back-link">← 게임 목록</a>
 
 <script>
 const canvas = document.getElementById('gameCanvas');
