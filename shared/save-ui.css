@@ -1,0 +1,48 @@
+.save-ui {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 12px 0;
+  font-size: 14px;
+  color: #444;
+}
+
+.save-ui__status {
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #f1f3f5;
+}
+
+.save-ui__status.is-saved {
+  background: #e7f5ff;
+  color: #1971c2;
+}
+
+.save-ui__status.is-saving {
+  background: #fff3bf;
+  color: #e67700;
+}
+
+.save-ui__status.is-error {
+  background: #ffe3e3;
+  color: #c92a2a;
+}
+
+.save-ui__timer {
+  color: #666;
+}
+
+.save-ui__button {
+  border: 0;
+  border-radius: 8px;
+  padding: 7px 12px;
+  background: #228be6;
+  color: white;
+  cursor: pointer;
+}
+
+.save-ui__button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
