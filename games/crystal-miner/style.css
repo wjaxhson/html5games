@@ -49,14 +49,6 @@
   background: #1d4ed8;
 }
 
-.saveButton {
-  background: #059669;
-}
-
-.saveButton:hover {
-  background: #047857;
-}
-
 #status {
   margin: 12px 0 0;
 }
