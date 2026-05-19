@@ -1,28 +1,33 @@
 import { createSaveManager } from "../../shared/save.js";
 
-const GAME_ID = "upgrade-clicker";
+const GAME_ID = "crystal-miner";
 
 const loginStatusEl = document.getElementById("loginStatus");
-const scoreTextEl = document.getElementById("scoreText");
-const powerTextEl = document.getElementById("powerText");
-const upgradeTextEl = document.getElementById("upgradeText");
-const clickButton = document.getElementById("clickButton");
-const upgradeButton = document.getElementById("upgradeButton");
+const crystalTextEl = document.getElementById("crystalText");
+const perSecondTextEl = document.getElementById("perSecondText");
+const minerCountTextEl = document.getElementById("minerCountText");
+const minerCostTextEl = document.getElementById("minerCostText");
+const mineButton = document.getElementById("mineButton");
+const buyMinerButton = document.getElementById("buyMinerButton");
 const saveButton = document.getElementById("saveButton");
 const statusEl = document.getElementById("status");
 
-let score = 0;
-let clickPower = 1;
-let upgradeLevel = 0;
+let crystals = 0;
+let minerCount = 0;
 
-function getUpgradeCost() {
-  return 10 + upgradeLevel * 15;
+function getMinerCost() {
+  return Math.floor(10 * Math.pow(1.25, minerCount));
+}
+
+function getCrystalsPerSecond() {
+  return minerCount;
 }
 
 function render() {
-  scoreTextEl.innerText = `점수: ${score}`;
-  powerTextEl.innerText = `클릭 파워: ${clickPower}`;
-  upgradeTextEl.innerText = `업그레이드 비용: ${getUpgradeCost()}`;
+  crystalTextEl.innerText = Math.floor(crystals);
+  perSecondTextEl.innerText = getCrystalsPerSecond();
+  minerCountTextEl.innerText = minerCount;
+  minerCostTextEl.innerText = getMinerCost();
 }
 
 const saveManager = createSaveManager({
@@ -32,16 +37,14 @@ const saveManager = createSaveManager({
 
   getSaveData() {
     return {
-      score,
-      clickPower,
-      upgradeLevel
+      crystals,
+      minerCount
     };
   },
 
   applySaveData(data) {
-    score = data.score ?? 0;
-    clickPower = data.clickPower ?? 1;
-    upgradeLevel = data.upgradeLevel ?? 0;
+    crystals = data.crystals ?? 0;
+    minerCount = data.minerCount ?? 0;
   },
 
   afterLoad() {
@@ -49,22 +52,21 @@ const saveManager = createSaveManager({
   }
 });
 
-clickButton.addEventListener("click", () => {
-  score += clickPower;
+mineButton.addEventListener("click", () => {
+  crystals += 1;
   render();
 });
 
-upgradeButton.addEventListener("click", () => {
-  const cost = getUpgradeCost();
+buyMinerButton.addEventListener("click", () => {
+  const cost = getMinerCost();
 
-  if (score < cost) {
-    alert("점수가 부족합니다.");
+  if (crystals < cost) {
+    alert("수정이 부족합니다.");
     return;
   }
 
-  score -= cost;
-  upgradeLevel += 1;
-  clickPower += 1;
+  crystals -= cost;
+  minerCount += 1;
 
   render();
 });
@@ -72,5 +74,10 @@ upgradeButton.addEventListener("click", () => {
 saveButton.addEventListener("click", async () => {
   await saveManager.save();
 });
+
+setInterval(() => {
+  crystals += getCrystalsPerSecond();
+  render();
+}, 1000);
 
 render();
