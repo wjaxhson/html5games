@@ -1,26 +1,31 @@
-export const games = [
-  {
-    id: "simple-clicker",
-    title: "Simple Clicker",
-    description: "가장 기본적인 클릭 게임",
-    visible: true
-  },
-  {
-    id: "upgrade-clicker",
-    title: "Upgrade Clicker",
-    description: "점수를 모아 클릭 파워를 강화하는 게임",
-    visible: true
-  },
-  {
-    id: "test-game",
-    title: "Test Game",
-    description: "개발 중인 테스트 게임",
-    visible: false
-  },
-  {
-    id: "crystal-miner",
-    title: "Crystal Miner",
-    description: "수정을 채굴하고 자동 채굴기를 구매하는 방치형 클리커 게임",
-    visible: true
-  }
+export const gameFolders = [
+  "simple-clicker",
+  "upgrade-clicker",
+  "test-game",
+  "crystal-miner"
 ];
+
+export async function loadGames() {
+  const results = await Promise.allSettled(
+    gameFolders.map(async (id) => {
+      const res = await fetch(`./games/${id}/meta.json`);
+      if (!res.ok) throw new Error(`${id} meta.json 로드 실패`);
+
+      const meta = await res.json();
+
+      return {
+        id,
+        title: meta.title ?? id,
+        description: meta.description ?? "",
+        thumbnail: meta.thumbnail ?? "thumbnail.png",
+        visible: meta.visible !== false,
+        path: `./games/${id}/`
+      };
+    })
+  );
+
+  return results
+    .filter((result) => result.status === "fulfilled")
+    .map((result) => result.value)
+    .filter((game) => game.visible);
+}
