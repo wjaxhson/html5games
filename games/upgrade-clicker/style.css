@@ -31,14 +31,6 @@
   background: #059669;
 }
 
-#saveButton {
-  background: #4b5563;
-}
-
-#saveButton:hover {
-  background: #374151;
-}
-
 #status {
   margin: 0;
 }
