@@ -197,6 +197,13 @@ users/abcd1234/games/simple-clicker
 자세한 게임 목록 관리 방식은
 `docs/game_list_system.md` 를 참고한다.
 
+## shared 공통 UI
+
+- `shared/save-ui.js`: 게임 저장 UI 공통 모듈
+- `shared/save-ui.css`: 저장 UI 전용 스타일
+- 각 게임은 자체 저장 로직만 만들고, 저장 버튼/자동저장 카운트다운/저장 상태 표시는 `createSaveUI()`를 사용한다.
+- 게임별 `index.html`에서는 `save-ui.css`를 게임별 CSS보다 뒤에 로드한다.
+
 ---
 
 # 개발 방향
