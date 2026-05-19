@@ -1,14 +1,14 @@
 # 게임 템플릿 가이드
 
 새 게임은 아래 구조를 기준으로 생성한다.
-
+```txt
 games/game-id/
 ├── index.html
 ├── style.css
 ├── script.js
 ├── meta.json
 └── thumbnail.png
-
+```
 ---
 
 # 파일 설명
