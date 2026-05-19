@@ -5,7 +5,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 import { auth } from "./shared/firebase.js";
-import { games } from "./shared/game-list.js";
+import { loadGames } from "./shared/game-list.js";
 
 const provider = new GoogleAuthProvider();
 
@@ -27,29 +27,23 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-games
-  .filter((game) => game.visible)
-  .forEach((game) => {
+loadGames().then((games) => {
+  games.forEach((game) => {
     const li = document.createElement("li");
 
-    const gamePath = `./games/${game.id}/`;
-    const thumbnailPath = `./games/${game.id}/thumbnail.png`;
-
     li.innerHTML = `
-      <a href="${gamePath}" class="game-card">
+      <a href="${game.path}">
         <img
-          src="${thumbnailPath}"
+          src="${game.path}${game.thumbnail}"
           alt="${game.title}"
-          class="game-thumbnail"
+          width="160"
           onerror="this.src='./shared/default-thumbnail.png'"
-        >
-
-        <div class="game-info">
-          <h3>${game.title}</h3>
-          <p>${game.description}</p>
-        </div>
+        />
+        <strong>${game.title}</strong>
+        <p>${game.description}</p>
       </a>
     `;
 
     gameListEl.appendChild(li);
   });
+});
