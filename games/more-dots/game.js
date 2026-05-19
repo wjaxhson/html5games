@@ -253,13 +253,13 @@ function showGameOver() {
 
     <div style="text-align:center">
       <div class="big-score">${score}</div>
-      <div class="score-label">점</div>
+      <div class="score-label"></div>
     </div>
 
     <div class="overlay-sub">
       최고 기록:
       <strong style="color:var(--success)">
-        ${best}점
+        ${best}
       </strong>
       <br>
       레벨 ${level}까지 도달!
