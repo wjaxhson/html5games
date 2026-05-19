@@ -5,12 +5,11 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 import { auth } from "./shared/firebase.js";
-
 import { games } from "./shared/game-list.js";
 
 const provider = new GoogleAuthProvider();
-const gameListEl = document.getElementById("gameList");
 
+const gameListEl = document.getElementById("gameList");
 const loginBtn = document.getElementById("loginBtn");
 const userText = document.getElementById("userText");
 
@@ -40,9 +39,9 @@ games
       <a href="${gamePath}" class="game-card">
         <img
           src="${thumbnailPath}"
-          onerror="this.src='./shared/default-thumbnail.png'"
           alt="${game.title}"
           class="game-thumbnail"
+          onerror="this.src='./shared/default-thumbnail.png'"
         >
 
         <div class="game-info">
