@@ -33,7 +33,7 @@
         <span>5문제 연속 성공하면 클리어! 한 번이라도 틀리면 즉시 탈락.</span>
       </div>
     </div>
-    <button class="btn-start" onclick="startGame()">시작하기 →</button>
+    <button class="btn" id="startBtn">시작하기</button>
   </div>
 
   <!-- GAME -->
@@ -59,12 +59,13 @@
       <div class="result-stats" id="result-stats"></div>
       <div class="review-list" id="review-list"></div>
     </div>
-    <button class="btn-start" onclick="startGame()">다시하기 →</button>
+    <button class="btn" id="retryBtn">다시하기 →</button>
   </div>
 
 </div>
 
 <div id="feedback"><div id="feedback-inner"></div></div>
+<a href="../../index.html" class="back-link">← 게임 목록</a>
 <script type="module" src="./game.js"></script>
 </body>
 </html>
