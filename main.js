@@ -34,7 +34,7 @@ loadGames().then((games) => {
     li.innerHTML = `
       <a href="${game.path}">
         <img
-          src="${game.path}${game.thumbnail}"
+          src="${game.path}thumbnail.png"
           alt="${game.title}"
           width="160"
           onerror="this.src='./shared/default-thumbnail.png'"
