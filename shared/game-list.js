@@ -4,7 +4,9 @@ export const gameFolders = [
   "test-game",
   "crystal-miner",
   "trace-the-line",
-  "more-dots"
+  "more-dots",
+  "stroop-test",
+  "path-memory"
 ];
 
 export async function loadGames() {
