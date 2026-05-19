@@ -37,7 +37,12 @@ loadGames().then((games) => {
 
     li.innerHTML = `
       <a class="game-card" href="${gamePath}">
-        <img class="game-thumbnail" src="${thumbnailPath}" alt="${game.title} 썸네일">
+        <img
+          class="game-thumbnail"
+          src="${thumbnailPath}"
+          alt="${game.title} 썸네일"
+          onerror="this.onerror=null; this.src='./assets/default-thumbnail.png';"
+        >
         <div class="game-info">
           <h3>${game.title}</h3>
           <p>${game.description}</p>
