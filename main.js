@@ -28,19 +28,20 @@ onAuthStateChanged(auth, (user) => {
 });
 
 loadGames().then((games) => {
-  games.forEach((game) => {
+  games
+  .filter((game) => game.visible)
+  .forEach((game) => {
     const li = document.createElement("li");
+    const gamePath = `./games/${game.id}/`;
+    const thumbnailPath = `./games/${game.id}/thumbnail.png`;
 
     li.innerHTML = `
-      <a href="${game.path}">
-        <img
-          src="${game.path}thumbnail.png"
-          alt="${game.title}"
-          width="160"
-          onerror="this.src='./shared/default-thumbnail.png'"
-        />
-        <strong>${game.title}</strong>
-        <p>${game.description}</p>
+      <a class="game-card" href="${gamePath}">
+        <img class="game-thumbnail" src="${thumbnailPath}" alt="${game.title} 썸네일">
+        <div class="game-info">
+          <h3>${game.title}</h3>
+          <p>${game.description}</p>
+        </div>
       </a>
     `;
 
