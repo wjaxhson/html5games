@@ -3,7 +3,8 @@ export const gameFolders = [
   "upgrade-clicker",
   "test-game",
   "crystal-miner",
-  "trace-the-line"
+  "trace-the-line",
+  "more-dots"
 ];
 
 export async function loadGames() {
