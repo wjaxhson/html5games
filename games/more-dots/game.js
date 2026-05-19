@@ -241,17 +241,38 @@ function loop(ts) {
 }
 
 function showGameOver() {
-  if (score > best) { best = score; bestEl.textContent = best; }
+  if (score > best) {
+    best = score;
+    bestEl.textContent = best;
+  }
+
   overlay.classList.remove('hidden');
+
   overlay.innerHTML = `
     <div class="overlay-title">게임 오버</div>
+
     <div style="text-align:center">
       <div class="big-score">${score}</div>
       <div class="score-label">점</div>
     </div>
-    <div class="overlay-sub">최고 기록: <strong style="color:var(--success)">${best}점</strong><br>레벨 ${level}까지 도달!</div>
-    <button class="btn" onclick="startGame()">다시 하기</button>
+
+    <div class="overlay-sub">
+      최고 기록:
+      <strong style="color:var(--success)">
+        ${best}점
+      </strong>
+      <br>
+      레벨 ${level}까지 도달!
+    </div>
+
+    <button class="btn" id="restart-btn">
+      다시 하기
+    </button>
   `;
+
+  document
+    .getElementById('restart-btn')
+    .addEventListener('click', startGame);
 }
 
 canvas.addEventListener('pointerdown', e => {
@@ -261,3 +282,6 @@ canvas.addEventListener('pointerdown', e => {
   const py = (e.clientY - rect.top)  / rect.height * H;
   handleTap(px, py);
 }, { passive: false });
+
+document.getElementById('start-btn')
+  .addEventListener('click', startGame);
