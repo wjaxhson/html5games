@@ -4,3 +4,58 @@ body {
   text-align: center;
   margin-top: 100px;
 }
+
+#gameList {
+  list-style: none;
+  padding: 0;
+
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+#gameList li {
+  margin: 0;
+}
+
+.game-card {
+  display: block;
+
+  text-decoration: none;
+  color: inherit;
+
+  border: 1px solid #444;
+  border-radius: 12px;
+
+  overflow: hidden;
+  background: #1e1e1e;
+
+  transition: transform 0.15s ease;
+}
+
+.game-card:hover {
+  transform: translateY(-4px);
+}
+
+.game-thumbnail {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+
+  object-fit: cover;
+  display: block;
+
+  background: #333;
+}
+
+.game-info {
+  padding: 12px;
+}
+
+.game-info h3 {
+  margin: 0 0 8px;
+}
+
+.game-info p {
+  margin: 0;
+  opacity: 0.8;
+}
