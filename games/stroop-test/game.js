@@ -294,3 +294,8 @@ setInterval(() => {
   const d = document.getElementById('demo-word');
   if (d) d.style.color = demoColors[di];
 }, 1200);
+
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("start-btn")?.addEventListener("click", startGame);
+  document.getElementById("retry-btn")?.addEventListener("click", startGame);
+});
