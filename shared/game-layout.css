@@ -14,12 +14,15 @@
 }
 
 .game-container {
-  width: 100%;
-  max-width: 720px;
-
+  width: min(100% - 32px, 480px);
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 32px 0;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
 .game-header {
