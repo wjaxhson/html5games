@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="../../shared/common.css" />
   <link rel="stylesheet" href="../../shared/game-layout.css" />
   <link rel="stylesheet" href="./style.css" />
+  <link rel="stylesheet" href="../../shared/save-ui.css">
 </head>
 
 <body class="game-page">
@@ -53,15 +54,10 @@
       </div>
     </section>
 
-    <section class="game-panel game-status">
-      <div class="game-actions">
-        <button id="saveButton" class="saveButton">
-          직접 저장
-        </button>
-      </div>
-
-      <p id="status">저장 준비 중...</p>
-    </section>
+    <div class="panel">
+      <div id="save-ui"></div>
+      <p id="status" hidden>저장 준비 중...</p>
+    </div>
   </main>
 
   <script type="module" src="./game.js"></script>
