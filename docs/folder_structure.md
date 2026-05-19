@@ -75,8 +75,28 @@ games/
     index.html
     game.js
     style.css
+    meta.json
     thumbnail.png
 ```
+
++ meta.json 설명
+  
+`thumbnail.png` 파일명은 고정한다.
+`meta.json`에는 썸네일 경로를 적지 않는다.
+
+예시:
+
+{
+  "title": "Crystal Miner",
+  "description": "수정을 채굴하고 자동 채굴기를 구매하는 방치형 클리커 게임",
+  "visible": true
+}
+
+`visible: false`인 게임은 메인 목록에 표시하지 않는다.
+단, 직접 URL로 접근하는 것은 가능하다.
+
+메인 페이지의 게임 목록은 `shared/game-list.js`에 등록된 게임 폴더 목록을 기준으로 각 게임의 `meta.json`을 불러와 생성한다.
+
 
 ---
 
