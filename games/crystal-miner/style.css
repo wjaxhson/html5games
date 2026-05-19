@@ -1,0 +1,75 @@
+.crystal-miner-panel {
+  text-align: center;
+}
+
+#loginStatus {
+  margin: 0 0 16px;
+  color: #bdbdbd;
+}
+
+.resource {
+  margin: 20px 0;
+
+  font-size: 36px;
+  font-weight: 800;
+}
+
+.production-text {
+  margin: 0 0 20px;
+  color: #d1d5db;
+}
+
+#mineButton {
+  width: 220px;
+  height: 220px;
+
+  border-radius: 50%;
+
+  background: #7c3aed;
+  color: white;
+
+  font-size: 28px;
+}
+
+#mineButton:hover {
+  background: #6d28d9;
+}
+
+#mineButton:active {
+  transform: scale(0.96);
+}
+
+.buyButton {
+  width: 100%;
+
+  background: #2563eb;
+}
+
+.buyButton:hover {
+  background: #1d4ed8;
+}
+
+.saveButton {
+  background: #059669;
+}
+
+.saveButton:hover {
+  background: #047857;
+}
+
+#status {
+  margin: 12px 0 0;
+}
+
+@media (max-width: 768px) {
+  #mineButton {
+    width: 180px;
+    height: 180px;
+
+    font-size: 24px;
+  }
+
+  .resource {
+    font-size: 30px;
+  }
+}
