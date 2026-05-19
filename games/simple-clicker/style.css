@@ -1,0 +1,32 @@
+.simple-clicker-panel {
+  text-align: center;
+}
+
+#loginStatus {
+  margin: 0 0 16px;
+  color: #bdbdbd;
+}
+
+#score {
+  margin: 24px 0;
+
+  font-size: 56px;
+  font-weight: 800;
+}
+
+#clickButton {
+  font-size: 22px;
+  padding: 18px 36px;
+}
+
+#saveButton {
+  background: #4b5563;
+}
+
+#saveButton:hover {
+  background: #374151;
+}
+
+#status {
+  margin: 0;
+}
