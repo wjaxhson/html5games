@@ -3,38 +3,29 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
   <title>Upgrade Clicker</title>
-
-  <link rel="stylesheet" href="../../shared/common.css" />
-  <link rel="stylesheet" href="../../shared/game-layout.css" />
-  <link rel="stylesheet" href="./style.css" />
+  <link rel="stylesheet" href="../../shared/common.css">
+  <link rel="stylesheet" href="../../shared/game-layout.css">
+  <link rel="stylesheet" href="../../shared/save-ui.css">
+  <link rel="stylesheet" href="./style.css">
 </head>
+<body>
+  <main>
+    <h1>Upgrade Clicker</h1>
 
-<body class="game-page">
-  <main class="game-container">
-    <header class="game-header">
-      <h1 class="game-title">Upgrade Clicker</h1>
-      <a class="game-back-link" href="../../index.html">← 게임 목록</a>
-    </header>
+    <p id="loginStatus">로그인 확인 중...</p>
 
-    <section class="game-panel upgrade-clicker-panel">
-      <p id="loginStatus">로그인 확인 중...</p>
+    <h2 id="scoreText">점수: 0</h2>
+    <p id="powerText">클릭 파워: 1</p>
+    <p id="upgradeText">업그레이드 비용: 10</p>
 
-      <h2 id="scoreText">점수: 0</h2>
-      <p id="powerText">클릭 파워: 1</p>
-      <p id="upgradeText">업그레이드 비용: 10</p>
+    <button id="clickButton">클릭!</button>
+    <button id="upgradeButton">클릭 파워 업그레이드</button>
 
-      <div class="game-actions">
-        <button id="clickButton">클릭!</button>
-        <button id="upgradeButton">클릭 파워 업그레이드</button>
-        <button id="saveButton">직접 저장</button>
-      </div>
-    </section>
+    <div id="save-ui"></div>
+    <p id="status" hidden>자동 저장 준비 중...</p>
 
-    <section class="game-panel game-status">
-      <p id="status">자동 저장 준비 중...</p>
-    </section>
+    <a href="../../">메인으로 돌아가기</a>
   </main>
 
   <script type="module" src="./game.js"></script>
