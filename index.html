@@ -3,21 +3,26 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>HTML5 Games</title>
+
+  <link rel="stylesheet" href="./shared/common.css" />
 </head>
+
 <body>
-  <h1>HTML5 Games</h1>
+  <main class="container">
+    <h1>HTML5 Games</h1>
 
-  <section>
-    <h2>로그인</h2>
-    <button id="loginBtn">Google 로그인</button>
-    <p id="userText">로그인하지 않음</p>
-  </section>
+    <section class="user-area">
+      <button id="loginBtn">Google 로그인</button>
+      <p id="userText">로그인하지 않음</p>
+    </section>
 
-  <section>
-    <h2>게임 목록</h2>
-    <ul id="gameList"></ul>
-  </section>
+    <section>
+      <h2 class="section-title">게임 목록</h2>
+      <ul id="gameList"></ul>
+    </section>
+  </main>
 
   <script type="module" src="./main.js"></script>
 </body>
