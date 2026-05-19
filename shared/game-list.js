@@ -12,12 +12,11 @@ export async function loadGames() {
       if (!res.ok) throw new Error(`${id} meta.json 로드 실패`);
 
       const meta = await res.json();
-
+      
       return {
         id,
         title: meta.title ?? id,
         description: meta.description ?? "",
-        thumbnail: meta.thumbnail ?? "thumbnail.png",
         visible: meta.visible !== false,
         path: `./games/${id}/`
       };
@@ -28,4 +27,5 @@ export async function loadGames() {
     .filter((result) => result.status === "fulfilled")
     .map((result) => result.value)
     .filter((game) => game.visible);
+  
 }
