@@ -24,6 +24,8 @@ https://html5games-a4y.pages.dev/
 - shared/common.css
 - shared/game-layout.css
 - shared/save.js
+- shared/save-ui.js
+- shared/save-ui.css
 
 ### 현재 게임
 
@@ -82,6 +84,17 @@ html5games:{gameId}:save
 - 로그인 상태: Firestore
 - 비로그인 상태: localStorage
 
+저장 UI는 shared/save-ui.js의 createSaveUI()를 사용한다.
+
+save-ui 기능:
+- 저장 버튼
+- 저장 상태 표시
+- 자동 저장 남은 시간 표시
+
+각 게임은 saveManager.save()만 연결한다.
+
+기존 saveButton 방식은 사용하지 않는다.
+
 ## 게임 페이지 규칙
 
 각 게임은 독립 실행 가능해야 한다.
@@ -92,7 +105,10 @@ html5games:{gameId}:save
 <link rel="stylesheet" href="../../shared/common.css">
 <link rel="stylesheet" href="../../shared/game-layout.css">
 <link rel="stylesheet" href="./style.css">
+<link rel="stylesheet" href="../../shared/save-ui.css">
 ```
+save-ui.css는 가장 마지막에 로드한다.
+(게임별 CSS 충돌 방지)
 
 기본 HTML 구조:
 
@@ -115,6 +131,20 @@ html5games:{gameId}:save
 
   <script type="module" src="./game.js"></script>
 </body>
+```
+
+메인 페이지 게임 카드는 아래 구조를 유지한다:
+
+```html
+<a class="game-card">
+  <img class="game-thumbnail">
+  <div class="game-info">
+```
+
+thumbnail.png가 없으면:
+
+```html
+onerror="this.onerror=null; this.src='./assets/default-thumbnail.png';"
 ```
 
 ## 다음 작업 우선순위
