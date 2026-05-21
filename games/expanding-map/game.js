@@ -126,7 +126,8 @@ function moveToMap(dx, dy) {
     player.y = nextMap.size - 1;
     player.x = clamp(player.x, 0, nextMap.size - 1);
   }
-
+  
+  ensurePlayerSpawnSafe(nextMap);
   draw();
 }
 
@@ -202,6 +203,18 @@ function canEnterTile(tile) {
   }
 
   return true;
+}
+
+function ensurePlayerSpawnSafe(map) {
+  const tile = map.tiles[player.y]?.[player.x];
+  if (!tile) return;
+
+  tile.terrain = TERRAIN.FLOOR;
+  tile.object = OBJECT.NONE;
+  tile.scoreValue = 0;
+  tile.enemyType = null;
+  tile.enemyHp = 0;
+  tile.collected = false;
 }
 
 function handleTile(tile, lastDx, lastDy) {
