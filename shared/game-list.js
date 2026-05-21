@@ -6,7 +6,8 @@ export const gameFolders = [
   "trace-the-line",
   "more-dots",
   "stroop-test",
-  "path-memory"
+  "path-memory",
+  "expanding-map"
 ];
 
 export async function loadGames() {
