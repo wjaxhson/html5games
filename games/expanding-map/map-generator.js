@@ -20,7 +20,7 @@ export const TERRAIN = {
 
 export const OBJECT = {
   NONE: "none",
-  COIN: "coin",
+  MONEY: "money",
   HEAL: "heal",
   ENEMY: "enemy",
   ITEM: "item"
@@ -43,16 +43,16 @@ export const techTree = [
   { id: "size_9", name: "9x9 확장", icon: "⬛", description: "새로 생성되는 맵이 최대 9x9까지 커질 수 있습니다.", requires: ["size_8"] },
   { id: "size_10", name: "10x10 확장", icon: "⬛", description: "새로 생성되는 맵이 최대 10x10까지 커질 수 있습니다.", requires: ["size_9"] },
 
-  { id: "score_1", name: "+1 점수 아이템", icon: "🪙", description: "+1 코인이 등장합니다.", requires: [] },
-  { id: "score_2", name: "+2 점수 아이템", icon: "🪙", description: "+2 코인이 등장합니다.", requires: ["score_1"] },
-  { id: "score_3", name: "+3 점수 아이템", icon: "🪙", description: "+3 코인이 등장합니다.", requires: ["score_2"] },
-  { id: "score_4", name: "+4 점수 아이템", icon: "🪙", description: "+4 코인이 등장합니다.", requires: ["score_3"] },
-  { id: "score_5", name: "+5 점수 아이템", icon: "🪙", description: "+5 코인이 등장합니다.", requires: ["score_4"] },
-  { id: "score_6", name: "+6 점수 아이템", icon: "🪙", description: "+6 코인이 등장합니다.", requires: ["score_5"] },
-  { id: "score_7", name: "+7 점수 아이템", icon: "🪙", description: "+7 코인이 등장합니다.", requires: ["score_6"] },
-  { id: "score_8", name: "+8 점수 아이템", icon: "🪙", description: "+8 코인이 등장합니다.", requires: ["score_7"] },
-  { id: "score_9", name: "+9 점수 아이템", icon: "🪙", description: "+9 코인이 등장합니다.", requires: ["score_8"] },
-  { id: "score_10", name: "+10 점수 아이템", icon: "🪙", description: "+10 코인이 등장합니다.", requires: ["score_9"] },
+  { id: "money_1", name: "소지금 규칙", icon: "💰", description: "돈 아이템이 등장하고 소지금이 생깁니다.", requires: [] },
+  { id: "money_2", name: "+2 돈 아이템", icon: "💰", description: "+2 돈 아이템이 등장합니다.", requires: ["money_1"] },
+  { id: "money_3", name: "+3 돈 아이템", icon: "💰", description: "+3 돈 아이템이 등장합니다.", requires: ["money_2"] },
+  { id: "money_4", name: "+4 돈 아이템", icon: "💰", description: "+4 돈 아이템이 등장합니다.", requires: ["money_3"] },
+  { id: "money_5", name: "+5 돈 아이템", icon: "💰", description: "+5 돈 아이템이 등장합니다.", requires: ["money_4"] },
+  { id: "money_6", name: "+6 돈 아이템", icon: "💰", description: "+6 돈 아이템이 등장합니다.", requires: ["money_5"] },
+  { id: "money_7", name: "+7 돈 아이템", icon: "💰", description: "+7 돈 아이템이 등장합니다.", requires: ["money_6"] },
+  { id: "money_8", name: "+8 돈 아이템", icon: "💰", description: "+8 돈 아이템이 등장합니다.", requires: ["money_7"] },
+  { id: "money_9", name: "+9 돈 아이템", icon: "💰", description: "+9 돈 아이템이 등장합니다.", requires: ["money_8"] },
+  { id: "money_10", name: "+10 돈 아이템", icon: "💰", description: "+10 돈 아이템이 등장합니다.", requires: ["money_9"] },
 
   { id: "grass_biome", name: "잔디 지형", icon: "🌿", description: "잔디 지형이 등장합니다.", requires: [] },
   { id: "tall_grass", name: "긴 풀", icon: "🌾", description: "긴 풀이 등장합니다.", requires: ["grass_biome"] },
@@ -70,7 +70,7 @@ export const techTree = [
   { id: "ice_floor", name: "빙판", icon: "🧊", description: "빙판 지형이 등장합니다.", requires: ["snow_biome"] },
   { id: "frost_field", name: "서리 지대", icon: "🌨️", description: "서리 지대가 등장합니다.", requires: ["ice_floor"] },
 
-  { id: "health", name: "체력 규칙", icon: "❤️", description: "체력이 생기고 회복 타일이 등장합니다.", requires: ["score_1"] },
+  { id: "health", name: "체력 규칙", icon: "❤️", description: "체력이 생기고 회복 타일이 등장합니다.", requires: ["money_1"] },
 
   { id: "grass_enemy_1", name: "잔디 적: 슬라임", icon: "🟢", description: "잔디 지형에 약한 적이 등장합니다.", requires: ["health", "grass_biome"] },
   { id: "water_enemy_1", name: "물 적: 물방울", icon: "🔵", description: "물 지형에 약한 적이 등장합니다.", requires: ["health", "water_biome"] },
@@ -80,6 +80,10 @@ export const techTree = [
   { id: "attack_item", name: "공격 아이템", icon: "⚔️", description: "적을 공격할 수 있는 아이템이 등장합니다.", requires: ["health"] },
   { id: "water_boots", name: "물 건너기 아이템", icon: "🥾", description: "물을 쉽게 건널 수 있는 아이템이 등장합니다.", requires: ["water_biome"] },
   { id: "wall_breaker", name: "벽 파괴 아이템", icon: "🔨", description: "벽을 뚫는 아이템이 등장합니다.", requires: ["size_6"] }
+
+  { id: "inventory_menu", name: "인벤토리 메뉴", icon: "🎒", description: "아이템을 확인하는 인벤토리 메뉴가 열립니다.", requires: ["money_1"] },
+  { id: "map_menu", name: "지도 메뉴", icon: "🗺️", description: "현재 위치를 확인하는 지도 메뉴가 열립니다.", requires: ["size_6"] },
+  { id: "shop_menu", name: "상점 메뉴", icon: "🏪", description: "돈을 쓰는 상점 메뉴가 열립니다.", requires: ["money_1", "inventory_menu"] },
 ];
 
 export const rulePool = techTree;
@@ -274,10 +278,11 @@ function applyObjects(tiles, activeRules, mapX, mapY) {
 
       const objectValue = seededValue(mapX, mapY, row, col, "object");
 
-      const maxScore = getMaxScoreValue(ids);
-      if (maxScore > 0 && objectValue < 12) {
-        tile.object = OBJECT.COIN;
-        tile.scoreValue = 1 + (seededValue(mapX, mapY, row, col, "coin-value") % maxScore);
+      const maxMoney = getMaxMoneyValue(ids);
+
+      if (maxMoney > 0 && objectValue < 12) {
+        tile.object = OBJECT.MONEY;
+        tile.scoreValue = 1 + (seededValue(mapX, mapY, row, col, "money-value") % maxMoney);
         continue;
       }
 
@@ -303,9 +308,9 @@ function applyObjects(tiles, activeRules, mapX, mapY) {
   }
 }
 
-function getMaxScoreValue(ids) {
-  for (let score = 10; score >= 1; score -= 1) {
-    if (ids.has(`score_${score}`)) return score;
+function getMaxMoneyValue(ids) {
+  for (let money = 10; money >= 1; money -= 1) {
+    if (ids.has(`money_${money}`)) return money;
   }
 
   return 0;
@@ -369,9 +374,9 @@ function ensureNewRuleVisible({ tiles, rule, activeRules }) {
     return;
   }
 
-  if (rule.id.startsWith("score_")) {
-    const value = Number(rule.id.replace("score_", ""));
-    tile.object = OBJECT.COIN;
+  if (rule.id.startsWith("money_")) {
+    const value = Number(rule.id.replace("money_", ""));
+    tile.object = OBJECT.MONEY;
     tile.scoreValue = value;
     tile.collected = false;
     return;
