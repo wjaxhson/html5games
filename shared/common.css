@@ -149,6 +149,34 @@ h2 {
   overflow: hidden;
 }
 
+@media (max-width: 640px) {
+  #gameList {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  #gameList a {
+    padding: 10px;
+  }
+
+  #gameList img,
+  .game-thumbnail,
+  .game-thumb {
+    height: 100px;
+    max-height: 100px;
+    margin-bottom: 10px;
+  }
+
+  #gameList strong {
+    font-size: 15px;
+  }
+
+  #gameList p {
+    font-size: 12px;
+    -webkit-line-clamp: 3;
+  }
+}
+
 footer {
   width: 100%;
 
