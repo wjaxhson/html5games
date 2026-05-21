@@ -25,6 +25,7 @@ let world;
 let player;
 let activeRules;
 let score;
+let money;
 let hp;
 let items;
 
@@ -44,6 +45,7 @@ function resetGame() {
   world = {};
   activeRules = [];
   score = 0;
+  money = 0;
   hp = 3;
   items = {
     attack: 0,
@@ -194,10 +196,10 @@ function canEnterTile(tile) {
 }
 
 function handleTile(tile) {
-  if (tile.object === OBJECT.COIN && !tile.collected) {
+  if (tile.object === OBJECT.MONEY && !tile.collected) {
     tile.collected = true;
-    score += tile.scoreValue;
-    messageEl.textContent = `+${tile.scoreValue} 점수 아이템을 얻었습니다.`;
+    money += tile.scoreValue;
+    messageEl.textContent = `돈 +${tile.scoreValue}을 얻었습니다.`;
     return;
   }
 
@@ -303,7 +305,7 @@ function drawTile(tile, x, y, tileSize) {
   ctx.lineWidth = 2;
   ctx.strokeRect(px, py, tileSize, tileSize);
 
-  if (tile.object === OBJECT.COIN && !tile.collected) drawCoin(px, py, tileSize, tile.scoreValue);
+  if (tile.object === OBJECT.MONEY && !tile.collected) drawMoney(px, py, tileSize, tile.scoreValue);
   if (tile.object === OBJECT.HEAL && !tile.collected) drawHeal(px, py, tileSize);
   if (tile.object === OBJECT.ENEMY && !tile.collected) drawEnemy(px, py, tileSize);
   if (tile.object === OBJECT.ITEM && !tile.collected) drawItem(px, py, tileSize);
@@ -332,13 +334,13 @@ function getTerrainColor(terrain) {
   return "#1e293b";
 }
 
-function drawCoin(px, py, tileSize, value) {
+function drawMoney(px, py, tileSize, value) {
   const cx = px + tileSize / 2;
   const cy = py + tileSize / 2;
 
   ctx.fillStyle = "#facc15";
   ctx.beginPath();
-  ctx.arc(cx, cy, tileSize * 0.2, 0, Math.PI * 2);
+  ctx.arc(cx, cy, tileSize * 0.22, 0, Math.PI * 2);
   ctx.fill();
 
   ctx.fillStyle = "#713f12";
@@ -418,7 +420,9 @@ function updateInfo() {
   const latestRule = getLatestRule(currentMap);
 
   mapInfoEl.textContent = `${player.mapX}, ${player.mapY}`;
-  scoreInfoEl.textContent = hasRule("health") ? `${score} / HP ${hp}` : String(score);
+  scoreInfoEl.textContent = hasRule("health")
+    ? `점수 ${score} / 돈 ${money} / HP ${hp}`
+    : `점수 ${score} / 돈 ${money}`;
   ruleCountInfoEl.textContent = `${activeRules.length}개`;
 
   if (!latestRule) {
