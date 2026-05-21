@@ -31,6 +31,7 @@ let score;
 let money;
 let hp;
 let items;
+let isSliding;
 
 function getMapKey(x, y) {
   return `${x},${y}`;
@@ -170,7 +171,7 @@ function movePlayer(dx, dy) {
   player.x = nextX;
   player.y = nextY;
 
-  handleTile(nextTile);
+  handleTile(nextTile,dx,dy);
   draw();
 }
 
@@ -203,7 +204,7 @@ function canEnterTile(tile) {
   return true;
 }
 
-function handleTile(tile) {
+function handleTile(tile, lastDx, lastDy) {
   if (tile.object === OBJECT.MONEY && !tile.collected) {
     tile.collected = true;
     money += tile.scoreValue;
@@ -243,12 +244,36 @@ function handleTile(tile) {
     return;
   }
 
-  if (tile.terrain === TERRAIN.ICE) {
-    messageEl.textContent = "빙판입니다. 아직 미끄러짐은 구현 전입니다.";
+  if (tile.terrain === TERRAIN.ICE && hasRule("ice_terrain")) {
+    messageEl.textContent = "빙판에서 미끄러졌습니다.";
+    slidePlayer(lastDx, lastDy);
     return;
   }
 
   messageEl.textContent = "이동했습니다.";
+}
+
+function slidePlayer(dx, dy) {
+  const map = getCurrentMap();
+
+  const nextX = player.x + dx;
+  const nextY = player.y + dy;
+
+  if (nextX < 0 || nextX >= map.size || nextY < 0 || nextY >= map.size) {
+    messageEl.textContent = "빙판 끝에서 멈췄습니다.";
+    return;
+  }
+
+  const nextTile = map.tiles[nextY][nextX];
+
+  if (!canEnterTile(nextTile)) {
+    messageEl.textContent = "앞이 막혀서 멈췄습니다.";
+    return;
+  }
+
+  setTimeout(() => {
+    movePlayer(dx, dy);
+  }, 120);
 }
 
 function giveRandomItem() {
