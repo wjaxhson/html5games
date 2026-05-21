@@ -1,112 +1,32 @@
+import {
+  TILE,
+  VIEW_SIZE,
+  rulePool,
+  createStartMap,
+  createMap,
+  pickNewRule
+} from "./map-generator.js";
+
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
 const mapInfoEl = document.getElementById("mapInfo");
+const scoreInfoEl = document.getElementById("scoreInfo");
+const ruleCountInfoEl = document.getElementById("ruleCountInfo");
+const ruleIconEl = document.getElementById("ruleIcon");
 const ruleInfoEl = document.getElementById("ruleInfo");
-const messageEl = document.getElementById("message");
 const featureListEl = document.getElementById("featureList");
+const messageEl = document.getElementById("message");
 
 const backBtn = document.getElementById("backBtn");
 const resetBtn = document.getElementById("resetBtn");
 
-const VIEW_SIZE = 5;
 const TILE_SIZE = canvas.width / VIEW_SIZE;
-
-const TILE = {
-  FLOOR: "floor",
-  WALL: "wall",
-  WATER: "water",
-  COIN: "coin",
-  HEAL: "heal"
-};
-
-const featurePool = [
-  {
-    id: "walls",
-    name: "벽",
-    description: "일부 칸이 벽이 되어 지나갈 수 없습니다."
-  },
-  {
-    id: "water",
-    name: "물",
-    description: "물 칸이 생깁니다. 아직은 지나갈 수 있지만 이동이 불편해 보입니다."
-  },
-  {
-    id: "coins",
-    name: "코인",
-    description: "코인을 주울 수 있습니다."
-  },
-  {
-    id: "heal",
-    name: "회복 타일",
-    description: "초록색 회복 타일이 생깁니다."
-  }
-];
 
 let world;
 let player;
-let visitedMapOrder;
-let unlockedFeatures;
+let activeRules;
 let score;
-
-function createEmptyMap(x, y, featureId = null) {
-  const tiles = [];
-
-  for (let row = 0; row < VIEW_SIZE; row += 1) {
-    const line = [];
-
-    for (let col = 0; col < VIEW_SIZE; col += 1) {
-      line.push({
-        type: TILE.FLOOR,
-        collected: false
-      });
-    }
-
-    tiles.push(line);
-  }
-
-  const map = {
-    x,
-    y,
-    featureId,
-    tiles
-  };
-
-  applyFeatureToMap(map, featureId);
-
-  return map;
-}
-
-function applyFeatureToMap(map, featureId) {
-  if (!featureId) return;
-
-  const center = Math.floor(VIEW_SIZE / 2);
-
-  for (let row = 0; row < VIEW_SIZE; row += 1) {
-    for (let col = 0; col < VIEW_SIZE; col += 1) {
-      const isCenter = row === center && col === center;
-      if (isCenter) continue;
-
-      const seed = Math.abs((map.x * 92821 + map.y * 68917 + row * 31 + col * 17) % 100);
-
-      if (featureId === "walls" && seed < 18) {
-        map.tiles[row][col].type = TILE.WALL;
-      }
-
-      if (featureId === "water" && seed >= 18 && seed < 36) {
-        map.tiles[row][col].type = TILE.WATER;
-      }
-
-      if (featureId === "coins" && seed >= 36 && seed < 48) {
-        map.tiles[row][col].type = TILE.COIN;
-      }
-
-      if (featureId === "heal" && seed >= 48 && seed < 56) {
-        map.tiles[row][col].type = TILE.HEAL;
-      }
-    }
-  }
-}
 
 function getMapKey(x, y) {
   return `${x},${y}`;
@@ -116,10 +36,22 @@ function getCurrentMap() {
   return world[getMapKey(player.mapX, player.mapY)];
 }
 
-function getNextFeatureId() {
-  const used = new Set(unlockedFeatures);
-  const next = featurePool.find((feature) => !used.has(feature.id));
-  return next ? next.id : null;
+function resetGame() {
+  world = {};
+  activeRules = [];
+  score = 0;
+
+  player = {
+    mapX: 0,
+    mapY: 0,
+    x: 2,
+    y: 2
+  };
+
+  world[getMapKey(0, 0)] = createStartMap();
+
+  messageEl.textContent = "방향키 또는 아래 버튼으로 이동하세요.";
+  draw();
 }
 
 function moveToMap(dx, dy) {
@@ -130,20 +62,23 @@ function moveToMap(dx, dy) {
   const isNewMap = !world[key];
 
   if (isNewMap) {
-    const nextFeatureId = getNextFeatureId();
+    const newRule = pickNewRule(activeRules);
 
-    world[key] = createEmptyMap(nextMapX, nextMapY, nextFeatureId);
-    visitedMapOrder.push(key);
-
-    if (nextFeatureId) {
-      unlockedFeatures.push(nextFeatureId);
-      const feature = featurePool.find((item) => item.id === nextFeatureId);
-      messageEl.textContent = `새 맵 생성! 새로운 규칙 '${feature.name}'이 추가되었습니다.`;
+    if (newRule) {
+      activeRules.push(newRule);
+      messageEl.textContent = `새 맵 생성! '${newRule.name}'이 추가되었습니다.`;
     } else {
-      messageEl.textContent = "새 맵 생성! 더 이상 추가할 규칙이 없어 기본 맵이 생성되었습니다.";
+      messageEl.textContent = "새 맵 생성! 모든 규칙을 이미 보유 중입니다.";
     }
+
+    world[key] = createMap({
+      x: nextMapX,
+      y: nextMapY,
+      activeRules,
+      newlyAddedRule: newRule
+    });
   } else {
-    messageEl.textContent = "이미 방문한 맵으로 돌아왔습니다. 새 규칙은 추가되지 않습니다.";
+    messageEl.textContent = "이미 방문한 맵입니다. 새 규칙은 추가되지 않습니다.";
   }
 
   player.mapX = nextMapX;
@@ -201,12 +136,12 @@ function handleTile(tile) {
   if (tile.type === TILE.COIN && !tile.collected) {
     tile.collected = true;
     score += 1;
-    messageEl.textContent = `코인을 주웠습니다. 점수 +1`;
+    messageEl.textContent = "코인을 주웠습니다. 점수 +1";
     return;
   }
 
   if (tile.type === TILE.HEAL) {
-    messageEl.textContent = "회복 타일입니다. 아직 체력 시스템은 없지만 따뜻합니다.";
+    messageEl.textContent = "회복 타일입니다. 아직 체력 시스템은 없습니다.";
     return;
   }
 
@@ -216,56 +151,6 @@ function handleTile(tile) {
   }
 
   messageEl.textContent = "이동했습니다.";
-}
-
-function drawTile(tile, x, y) {
-  const px = x * TILE_SIZE;
-  const py = y * TILE_SIZE;
-
-  if (tile.type === TILE.FLOOR) ctx.fillStyle = "#1e293b";
-  if (tile.type === TILE.WALL) ctx.fillStyle = "#64748b";
-  if (tile.type === TILE.WATER) ctx.fillStyle = "#0284c7";
-  if (tile.type === TILE.COIN) ctx.fillStyle = tile.collected ? "#1e293b" : "#eab308";
-  if (tile.type === TILE.HEAL) ctx.fillStyle = "#22c55e";
-
-  ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
-
-  ctx.strokeStyle = "#334155";
-  ctx.lineWidth = 2;
-  ctx.strokeRect(px, py, TILE_SIZE, TILE_SIZE);
-}
-
-function drawPlayer() {
-  const centerX = player.x * TILE_SIZE + TILE_SIZE / 2;
-  const centerY = player.y * TILE_SIZE + TILE_SIZE / 2;
-
-  ctx.fillStyle = "#f97316";
-  ctx.beginPath();
-  ctx.arc(centerX, centerY, TILE_SIZE * 0.28, 0, Math.PI * 2);
-  ctx.fill();
-}
-
-function updateInfo() {
-  const map = getCurrentMap();
-  const feature = featurePool.find((item) => item.id === map.featureId);
-
-  mapInfoEl.textContent = `현재 맵: ${player.mapX}, ${player.mapY} / 점수: ${score}`;
-
-  if (feature) {
-    ruleInfoEl.textContent = `현재 맵 규칙: ${feature.name} - ${feature.description}`;
-  } else {
-    ruleInfoEl.textContent = "현재 맵 규칙: 없음";
-  }
-
-  if (unlockedFeatures.length === 0) {
-    featureListEl.textContent = "누적 규칙: 없음";
-  } else {
-    const names = unlockedFeatures
-      .map((id) => featurePool.find((featureItem) => featureItem.id === id)?.name)
-      .filter(Boolean);
-
-    featureListEl.textContent = `누적 규칙: ${names.join(", ")}`;
-  }
 }
 
 function draw() {
@@ -283,43 +168,154 @@ function draw() {
   updateInfo();
 }
 
-function resetGame() {
-  world = {};
-  visitedMapOrder = [];
-  unlockedFeatures = [];
-  score = 0;
+function drawTile(tile, x, y) {
+  const px = x * TILE_SIZE;
+  const py = y * TILE_SIZE;
 
-  player = {
-    mapX: 0,
-    mapY: 0,
-    x: 2,
-    y: 2
-  };
+  ctx.fillStyle = getTileColor(tile);
+  ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
 
-  const startKey = getMapKey(0, 0);
-  world[startKey] = createEmptyMap(0, 0, null);
-  visitedMapOrder.push(startKey);
+  if (tile.type === TILE.WALL) {
+    drawBrickPattern(px, py);
+  }
 
-  messageEl.textContent = "방향키 또는 버튼으로 이동하세요.";
-  draw();
+  if (tile.type === TILE.COIN && !tile.collected) {
+    drawCoin(px, py);
+  }
+
+  if (tile.type === TILE.HEAL) {
+    drawHeal(px, py);
+  }
+
+  ctx.strokeStyle = "#334155";
+  ctx.lineWidth = 2;
+  ctx.strokeRect(px, py, TILE_SIZE, TILE_SIZE);
+}
+
+function getTileColor(tile) {
+  if (tile.type === TILE.FLOOR) return "#1e293b";
+  if (tile.type === TILE.WALL) return "#a1a1aa";
+  if (tile.type === TILE.WATER) return "#0284c7";
+  if (tile.type === TILE.COIN) return tile.collected ? "#1e293b" : "#1e293b";
+  if (tile.type === TILE.HEAL) return "#14532d";
+
+  return "#1e293b";
+}
+
+function drawBrickPattern(px, py) {
+  ctx.strokeStyle = "rgba(51, 65, 85, 0.85)";
+  ctx.lineWidth = 2;
+
+  const brickHeight = TILE_SIZE / 5;
+
+  for (let i = 1; i < 5; i += 1) {
+    ctx.beginPath();
+    ctx.moveTo(px, py + brickHeight * i);
+    ctx.lineTo(px + TILE_SIZE, py + brickHeight * i);
+    ctx.stroke();
+  }
+
+  for (let row = 0; row < 5; row += 1) {
+    const offset = row % 2 === 0 ? 0 : TILE_SIZE / 4;
+
+    for (let col = 1; col < 4; col += 1) {
+      const x = px + offset + (TILE_SIZE / 4) * col;
+      ctx.beginPath();
+      ctx.moveTo(x, py + brickHeight * row);
+      ctx.lineTo(x, py + brickHeight * (row + 1));
+      ctx.stroke();
+    }
+  }
+}
+
+function drawCoin(px, py) {
+  const cx = px + TILE_SIZE / 2;
+  const cy = py + TILE_SIZE / 2;
+
+  ctx.fillStyle = "#facc15";
+  ctx.beginPath();
+  ctx.arc(cx, cy, TILE_SIZE * 0.18, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.strokeStyle = "#854d0e";
+  ctx.lineWidth = 3;
+  ctx.stroke();
+}
+
+function drawHeal(px, py) {
+  const cx = px + TILE_SIZE / 2;
+  const cy = py + TILE_SIZE / 2;
+  const size = TILE_SIZE * 0.28;
+
+  ctx.fillStyle = "#22c55e";
+  ctx.fillRect(cx - size / 2, cy - size * 1.5, size, size * 3);
+  ctx.fillRect(cx - size * 1.5, cy - size / 2, size * 3, size);
+}
+
+function drawPlayer() {
+  const cx = player.x * TILE_SIZE + TILE_SIZE / 2;
+  const cy = player.y * TILE_SIZE + TILE_SIZE / 2;
+  const radius = TILE_SIZE * 0.3;
+
+  ctx.fillStyle = "#f97316";
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = "#ffffff";
+  ctx.beginPath();
+  ctx.arc(cx - radius * 0.35, cy - radius * 0.25, radius * 0.14, 0, Math.PI * 2);
+  ctx.arc(cx + radius * 0.35, cy - radius * 0.25, radius * 0.14, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = "#0f172a";
+  ctx.beginPath();
+  ctx.arc(cx - radius * 0.35, cy - radius * 0.25, radius * 0.07, 0, Math.PI * 2);
+  ctx.arc(cx + radius * 0.35, cy - radius * 0.25, radius * 0.07, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function updateInfo() {
+  const currentMap = getCurrentMap();
+  const latestRule = getLatestRule(currentMap);
+
+  mapInfoEl.textContent = `${player.mapX}, ${player.mapY}`;
+  scoreInfoEl.textContent = String(score);
+  ruleCountInfoEl.textContent = `${activeRules.length}개`;
+
+  if (!latestRule) {
+    ruleIconEl.textContent = "▫️";
+    ruleInfoEl.textContent = "기본 규칙";
+    featureListEl.textContent = "아직 추가된 규칙이 없습니다.";
+    return;
+  }
+
+  ruleIconEl.textContent = latestRule.icon;
+  ruleInfoEl.textContent = latestRule.name;
+
+  const names = activeRules.map((rule) => rule.name).join(", ");
+  featureListEl.textContent = `${latestRule.description} / 보유 규칙: ${names}`;
+}
+
+function getLatestRule(map) {
+  if (map.newlyAddedRuleId) {
+    return rulePool.find((rule) => rule.id === map.newlyAddedRuleId);
+  }
+
+  if (activeRules.length > 0) {
+    return activeRules[activeRules.length - 1];
+  }
+
+  return null;
 }
 
 document.addEventListener("keydown", (event) => {
-  if (event.key === "ArrowUp" || event.key.toLowerCase() === "w") {
-    movePlayer(0, -1);
-  }
+  const key = event.key.toLowerCase();
 
-  if (event.key === "ArrowDown" || event.key.toLowerCase() === "s") {
-    movePlayer(0, 1);
-  }
-
-  if (event.key === "ArrowLeft" || event.key.toLowerCase() === "a") {
-    movePlayer(-1, 0);
-  }
-
-  if (event.key === "ArrowRight" || event.key.toLowerCase() === "d") {
-    movePlayer(1, 0);
-  }
+  if (key === "arrowup" || key === "w") movePlayer(0, -1);
+  if (key === "arrowdown" || key === "s") movePlayer(0, 1);
+  if (key === "arrowleft" || key === "a") movePlayer(-1, 0);
+  if (key === "arrowright" || key === "d") movePlayer(1, 0);
 });
 
 document.querySelectorAll("[data-dir]").forEach((button) => {
