@@ -8,103 +8,259 @@
   <link rel="stylesheet" href="../../shared/game-layout.css" />
   <style>
     body {
-      background: #111827;
-      color: #f9fafb;
+      margin: 0;
+      background: radial-gradient(circle at top, #172033 0%, #08111f 55%, #050914 100%);
+      color: #f8fafc;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
     .game-page {
-      max-width: 520px;
+      width: min(100%, 760px);
       margin: 0 auto;
-      padding: 16px;
+      padding: 18px 14px 28px;
+      box-sizing: border-box;
+    }
+
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    h1 {
+      margin: 0;
+      text-align: center;
+      font-size: clamp(32px, 8vw, 54px);
+      line-height: 1;
+      letter-spacing: -1px;
+    }
+
+    h1 span {
+      color: #60a5fa;
+    }
+
+    .subtitle {
+      margin: 8px 0 18px;
+      text-align: center;
+      color: #cbd5e1;
+      font-weight: 600;
+    }
+
+    button {
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 12px 16px;
+      background: linear-gradient(180deg, #2563eb, #1d4ed8);
+      color: white;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.22);
+    }
+
+    .icon-btn {
+      min-width: 54px;
+      height: 54px;
+      padding: 0;
+      font-size: 24px;
+      background: rgba(15, 23, 42, 0.9);
+      box-shadow: none;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .stat-card,
+    .rule-card,
+    .controls-panel {
+      border: 1px solid #334155;
+      border-radius: 16px;
+      background: rgba(15, 23, 42, 0.78);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 14px 35px rgba(0,0,0,0.25);
+      backdrop-filter: blur(6px);
+    }
+
+    .stat-card {
+      padding: 14px;
       text-align: center;
     }
 
+    .stat-label {
+      color: #e2e8f0;
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    .stat-value {
+      margin-top: 6px;
+      color: #60a5fa;
+      font-size: 28px;
+      font-weight: 900;
+    }
+
+    .rule-card {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      padding: 14px;
+      margin-bottom: 18px;
+      text-align: left;
+    }
+
+    .rule-icon {
+      flex: 0 0 54px;
+      height: 54px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      background: #334155;
+      font-size: 28px;
+    }
+
+    .rule-title {
+      color: #60a5fa;
+      font-weight: 900;
+      margin-bottom: 4px;
+    }
+
+    .rule-desc {
+      color: #e5e7eb;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .board-wrap {
+      display: flex;
+      justify-content: center;
+      margin: 0 auto 18px;
+    }
+
     canvas {
-      width: 100%;
-      max-width: 420px;
+      width: min(100%, 520px);
       aspect-ratio: 1 / 1;
       background: #0f172a;
       border: 2px solid #334155;
-      border-radius: 16px;
+      border-radius: 14px;
       image-rendering: pixelated;
       touch-action: none;
+      box-shadow: 0 16px 45px rgba(0,0,0,0.35);
     }
 
-    .info-box {
-      margin: 12px 0;
-      padding: 12px;
-      background: #1f2937;
-      border-radius: 12px;
+    .controls-panel {
+      width: min(100%, 520px);
+      margin: 0 auto;
+      padding: 16px;
+      box-sizing: border-box;
+    }
+
+    .controls-title {
+      color: #60a5fa;
+      font-size: 20px;
+      font-weight: 900;
+      text-align: center;
+      margin-bottom: 6px;
+    }
+
+    .message {
+      min-height: 22px;
+      text-align: center;
+      color: #cbd5e1;
       font-size: 14px;
-      line-height: 1.5;
+      margin-bottom: 14px;
     }
 
     .controls {
       display: grid;
-      grid-template-columns: repeat(3, 64px);
-      gap: 8px;
-      justify-content: center;
-      margin-top: 16px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      padding: 12px;
+      border: 1px solid #334155;
+      border-radius: 14px;
+      background: rgba(15, 23, 42, 0.75);
     }
 
-    .controls button,
-    .top-buttons button {
-      border: none;
+    .controls button {
+      height: 56px;
+      font-size: 24px;
       border-radius: 12px;
-      padding: 12px;
-      background: #2563eb;
-      color: white;
-      font-weight: 700;
-      cursor: pointer;
     }
 
     .controls .empty {
       visibility: hidden;
     }
 
-    .top-buttons {
-      display: flex;
-      justify-content: center;
-      gap: 8px;
-      margin: 12px 0;
-      flex-wrap: wrap;
-    }
+    @media (max-width: 520px) {
+      .stats {
+        grid-template-columns: 1fr;
+      }
 
-    .feature-list {
-      margin-top: 8px;
-      font-size: 13px;
-      color: #cbd5e1;
+      .top-bar {
+        align-items: flex-start;
+      }
+
+      .rule-card {
+        align-items: flex-start;
+      }
     }
   </style>
 </head>
 <body>
   <main class="game-page">
-    <h1>One More Rule</h1>
-
-    <div class="top-buttons">
-      <button id="backBtn">목록으로</button>
-      <button id="resetBtn">처음부터</button>
+    <div class="top-bar">
+      <button id="backBtn" class="icon-btn">☰</button>
+      <button id="resetBtn">↻ 다시 시작</button>
     </div>
 
-    <canvas id="gameCanvas" width="500" height="500"></canvas>
+    <h1>One More <span>Rule</span></h1>
+    <p class="subtitle">한 칸 너머, 새로운 규칙이 추가됩니다</p>
 
-    <div class="info-box">
-      <div id="mapInfo">현재 맵: 0, 0</div>
-      <div id="ruleInfo">현재 규칙: 없음</div>
-      <div id="message">방향키 또는 버튼으로 이동하세요.</div>
-      <div id="featureList" class="feature-list"></div>
+    <section class="stats">
+      <div class="stat-card">
+        <div class="stat-label">현재 맵</div>
+        <div id="mapInfo" class="stat-value">0, 0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">점수</div>
+        <div id="scoreInfo" class="stat-value">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">누적 규칙</div>
+        <div id="ruleCountInfo" class="stat-value">0개</div>
+      </div>
+    </section>
+
+    <section class="rule-card">
+      <div id="ruleIcon" class="rule-icon">▫️</div>
+      <div>
+        <div id="ruleInfo" class="rule-title">기본 규칙</div>
+        <div id="featureList" class="rule-desc">아직 추가된 규칙이 없습니다.</div>
+      </div>
+    </section>
+
+    <div class="board-wrap">
+      <canvas id="gameCanvas" width="500" height="500"></canvas>
     </div>
 
-    <div class="controls">
-      <button class="empty">-</button>
-      <button data-dir="up">▲</button>
-      <button class="empty">-</button>
-      <button data-dir="left">◀</button>
-      <button data-dir="down">▼</button>
-      <button data-dir="right">▶</button>
-    </div>
+    <section class="controls-panel">
+      <div class="controls-title">조작 방법</div>
+      <div id="message" class="message">방향키 또는 아래 버튼으로 이동하세요.</div>
+
+      <div class="controls">
+        <button class="empty">-</button>
+        <button data-dir="up">⬆</button>
+        <button class="empty">-</button>
+        <button data-dir="left">⬅</button>
+        <button data-dir="down">⬇</button>
+        <button data-dir="right">➡</button>
+      </div>
+    </section>
   </main>
 
-  <script src="./game.js"></script>
+  <script type="module" src="./game.js"></script>
 </body>
 </html>
