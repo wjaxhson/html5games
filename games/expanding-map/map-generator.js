@@ -79,7 +79,7 @@ export const techTree = [
 
   { id: "attack_item", name: "공격 아이템", icon: "⚔️", description: "적을 공격할 수 있는 아이템이 등장합니다.", requires: ["health"] },
   { id: "water_boots", name: "물 건너기 아이템", icon: "🥾", description: "물을 쉽게 건널 수 있는 아이템이 등장합니다.", requires: ["water_biome"] },
-  { id: "wall_breaker", name: "벽 파괴 아이템", icon: "🔨", description: "벽을 뚫는 아이템이 등장합니다.", requires: ["size_6"] }
+  { id: "wall_breaker", name: "벽 파괴 아이템", icon: "🔨", description: "벽을 뚫는 아이템이 등장합니다.", requires: ["size_6"] },
 
   { id: "inventory_menu", name: "인벤토리 메뉴", icon: "🎒", description: "아이템을 확인하는 인벤토리 메뉴가 열립니다.", requires: ["money_1"] },
   { id: "map_menu", name: "지도 메뉴", icon: "🗺️", description: "현재 위치를 확인하는 지도 메뉴가 열립니다.", requires: ["size_6"] },
