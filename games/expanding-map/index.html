@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>One More Rule</title>
+  <link rel="stylesheet" href="../../shared/common.css" />
+  <link rel="stylesheet" href="../../shared/game-layout.css" />
+  <style>
+    body {
+      background: #111827;
+      color: #f9fafb;
+    }
+
+    .game-page {
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 16px;
+      text-align: center;
+    }
+
+    canvas {
+      width: 100%;
+      max-width: 420px;
+      aspect-ratio: 1 / 1;
+      background: #0f172a;
+      border: 2px solid #334155;
+      border-radius: 16px;
+      image-rendering: pixelated;
+      touch-action: none;
+    }
+
+    .info-box {
+      margin: 12px 0;
+      padding: 12px;
+      background: #1f2937;
+      border-radius: 12px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(3, 64px);
+      gap: 8px;
+      justify-content: center;
+      margin-top: 16px;
+    }
+
+    .controls button,
+    .top-buttons button {
+      border: none;
+      border-radius: 12px;
+      padding: 12px;
+      background: #2563eb;
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .controls .empty {
+      visibility: hidden;
+    }
+
+    .top-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin: 12px 0;
+      flex-wrap: wrap;
+    }
+
+    .feature-list {
+      margin-top: 8px;
+      font-size: 13px;
+      color: #cbd5e1;
+    }
+  </style>
+</head>
+<body>
+  <main class="game-page">
+    <h1>One More Rule</h1>
+
+    <div class="top-buttons">
+      <button id="backBtn">목록으로</button>
+      <button id="resetBtn">처음부터</button>
+    </div>
+
+    <canvas id="gameCanvas" width="500" height="500"></canvas>
+
+    <div class="info-box">
+      <div id="mapInfo">현재 맵: 0, 0</div>
+      <div id="ruleInfo">현재 규칙: 없음</div>
+      <div id="message">방향키 또는 버튼으로 이동하세요.</div>
+      <div id="featureList" class="feature-list"></div>
+    </div>
+
+    <div class="controls">
+      <button class="empty">-</button>
+      <button data-dir="up">▲</button>
+      <button class="empty">-</button>
+      <button data-dir="left">◀</button>
+      <button data-dir="down">▼</button>
+      <button data-dir="right">▶</button>
+    </div>
+  </main>
+
+  <script src="./game.js"></script>
+</body>
+</html>
