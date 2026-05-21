@@ -1,0 +1,5 @@
+{
+  "title": "One More Rule",
+  "description": "5x5 시야 안에서 이동하며, 새로운 맵으로 나아갈 때마다 규칙이 하나씩 추가되는 탐험 게임입니다.",
+  "visible": true
+}
