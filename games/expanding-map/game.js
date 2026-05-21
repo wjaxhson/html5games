@@ -17,6 +17,7 @@ const ruleIconEl = document.getElementById("ruleIcon");
 const ruleInfoEl = document.getElementById("ruleInfo");
 const featureListEl = document.getElementById("featureList");
 const messageEl = document.getElementById("message");
+const menuBarEl = document.getElementById("menuBar");
 
 const backBtn = document.getElementById("backBtn");
 const resetBtn = document.getElementById("resetBtn");
@@ -292,6 +293,7 @@ function draw() {
 
   drawPlayer(tileSize);
   updateInfo();
+  renderMenus();
 }
 
 function drawTile(tile, x, y, tileSize) {
@@ -437,6 +439,35 @@ function updateInfo() {
 
   const names = activeRules.slice(-5).map((rule) => rule.name).join(", ");
   featureListEl.textContent = `${latestRule.description} / 최근 규칙: ${names}`;
+}
+
+function renderMenus() {
+  if (!menuBarEl) return;
+
+  const menus = [];
+
+  if (hasRule("inventory_menu")) {
+    menus.push({ label: "🎒 인벤토리", message: `공격 ${items.attack} / 벽파괴 ${items.wallBreaker} / 물신발 ${items.waterBoots ? "보유" : "없음"}` });
+  }
+
+  if (hasRule("map_menu")) {
+    menus.push({ label: "🗺️ 지도", message: `현재 위치: ${player.mapX}, ${player.mapY}` });
+  }
+
+  if (hasRule("shop_menu")) {
+    menus.push({ label: "🏪 상점", message: `소지금 ${money}. 상점 기능은 다음 단계에서 확장합니다.` });
+  }
+
+  menuBarEl.innerHTML = "";
+
+  menus.forEach((menu) => {
+    const button = document.createElement("button");
+    button.textContent = menu.label;
+    button.addEventListener("click", () => {
+      messageEl.textContent = menu.message;
+    });
+    menuBarEl.appendChild(button);
+  });
 }
 
 function getLatestRule(map) {
