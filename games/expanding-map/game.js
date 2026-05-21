@@ -22,6 +22,8 @@ const menuBarEl = document.getElementById("menuBar");
 const backBtn = document.getElementById("backBtn");
 const resetBtn = document.getElementById("resetBtn");
 
+let isMapViewOpen = false;
+
 let world;
 let player;
 let activeRules;
@@ -128,6 +130,11 @@ function moveToMap(dx, dy) {
 }
 
 function movePlayer(dx, dy) {
+  if (isMapViewOpen) {
+    messageEl.textContent = "지도 화면에서는 이동할 수 없습니다. 게임 화면으로 돌아가세요.";
+    return;
+  }
+  
   const map = getCurrentMap();
 
   const nextX = player.x + dx;
@@ -280,6 +287,13 @@ function resetAfterDeath() {
 }
 
 function draw() {
+  if (isMapViewOpen) {
+    drawWorldMap();
+    updateInfo();
+    renderMenus();
+    return;
+  }
+
   const map = getCurrentMap();
   const tileSize = canvas.width / map.size;
 
@@ -417,6 +431,78 @@ function drawPlayer(tileSize) {
   ctx.fill();
 }
 
+function drawWorldMap() {
+  const viewSize = 7;
+  const center = Math.floor(viewSize / 2);
+  const cellSize = canvas.width / viewSize;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "#020617";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  for (let row = 0; row < viewSize; row += 1) {
+    for (let col = 0; col < viewSize; col += 1) {
+      const mapX = player.mapX + (col - center);
+      const mapY = player.mapY + (row - center);
+      const key = getMapKey(mapX, mapY);
+      const map = world[key];
+
+      const px = col * cellSize;
+      const py = row * cellSize;
+
+      ctx.fillStyle = map ? getMapPreviewColor(map) : "#111827";
+      ctx.fillRect(px + 4, py + 4, cellSize - 8, cellSize - 8);
+
+      ctx.strokeStyle = mapX === player.mapX && mapY === player.mapY
+        ? "#f97316"
+        : "rgba(148, 163, 184, 0.5)";
+      ctx.lineWidth = mapX === player.mapX && mapY === player.mapY ? 4 : 2;
+      ctx.strokeRect(px + 4, py + 4, cellSize - 8, cellSize - 8);
+
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+
+      if (mapX === player.mapX && mapY === player.mapY) {
+        ctx.fillStyle = "#ffffff";
+        ctx.font = `${Math.max(18, cellSize * 0.28)}px sans-serif`;
+        ctx.fillText("나", px + cellSize / 2, py + cellSize / 2);
+      } else if (!map) {
+        ctx.fillStyle = "#64748b";
+        ctx.font = `${Math.max(18, cellSize * 0.34)}px sans-serif`;
+        ctx.fillText("?", px + cellSize / 2, py + cellSize / 2);
+      }
+    }
+  }
+
+  ctx.fillStyle = "#e5e7eb";
+  ctx.font = "14px sans-serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "bottom";
+  ctx.fillText("방문한 맵은 대표 지형 색으로 표시됩니다.", canvas.width / 2, canvas.height - 10);
+}
+
+function getMapPreviewColor(map) {
+  const counts = new Map();
+
+  for (const row of map.tiles) {
+    for (const tile of row) {
+      counts.set(tile.terrain, (counts.get(tile.terrain) ?? 0) + 1);
+    }
+  }
+
+  let mainTerrain = TERRAIN.FLOOR;
+  let maxCount = 0;
+
+  counts.forEach((count, terrain) => {
+    if (count > maxCount) {
+      mainTerrain = terrain;
+      maxCount = count;
+    }
+  });
+
+  return getTerrainColor(mainTerrain);
+}
+
 function updateInfo() {
   const currentMap = getCurrentMap();
   const latestRule = getLatestRule(currentMap);
@@ -451,7 +537,16 @@ function renderMenus() {
   }
 
   if (hasRule("map_menu")) {
-    menus.push({ label: "🗺️ 지도", message: `현재 위치: ${player.mapX}, ${player.mapY}` });
+    menus.push({
+      label: isMapViewOpen ? "게임 화면" : "지도",
+      action: () => {
+        isMapViewOpen = !isMapViewOpen;
+        messageEl.textContent = isMapViewOpen
+          ? "지도 화면입니다. 현재 위치를 중심으로 주변 맵을 표시합니다."
+          : "게임 화면으로 돌아왔습니다.";
+        draw();
+      }
+    });
   }
 
   if (hasRule("shop_menu")) {
@@ -464,6 +559,11 @@ function renderMenus() {
     const button = document.createElement("button");
     button.textContent = menu.label;
     button.addEventListener("click", () => {
+      if (menu.action) {
+        menu.action();
+        return;
+      }
+    
       messageEl.textContent = menu.message;
     });
     menuBarEl.appendChild(button);
