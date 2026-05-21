@@ -35,6 +35,8 @@ export const BIOME = {
 };
 
 export const techTree = [
+  { id: "wall_terrain", name: "벽 지형", icon: "🧱", description: "벽이 등장합니다. 벽은 통과할 수 없습니다.", requires: [] },
+  
   { id: "size_6", name: "6x6 확장", icon: "⬛", description: "새로 생성되는 맵이 최대 6x6까지 커질 수 있습니다.", requires: [] },
   { id: "size_7", name: "7x7 확장", icon: "⬛", description: "새로 생성되는 맵이 최대 7x7까지 커질 수 있습니다.", requires: ["size_6"] },
   { id: "size_8", name: "8x8 확장", icon: "⬛", description: "새로 생성되는 맵이 최대 8x8까지 커질 수 있습니다.", requires: ["size_7"] },
@@ -109,6 +111,23 @@ export function createMap({ x, y, activeRules, newlyAddedRule, fromBiome = BIOME
   const size = getMapSize(activeRules);
   const biomeInfo = pickBiomeInfo(activeRules, fromBiome, x, y);
   const tiles = createTiles(size, biomeInfo, activeRules, x, y);
+
+  const center = Math.floor(size / 2);
+
+  tiles[center][center] = {
+    terrain: TERRAIN.FLOOR,
+    object: OBJECT.NONE,
+    scoreValue: 0,
+    enemyType: null,
+    enemyHp: 0,
+    collected: false
+  };
+
+  ensureNewRuleVisible({
+    tiles,
+    rule: newlyAddedRule,
+    activeRules
+  });
 
   return {
     x,
@@ -194,16 +213,6 @@ function createTiles(size, biomeInfo, activeRules, mapX, mapY) {
 
   applyObjects(tiles, activeRules, mapX, mapY);
 
-  const center = Math.floor(size / 2);
-  tiles[center][center] = {
-    terrain: TERRAIN.FLOOR,
-    object: OBJECT.NONE,
-    scoreValue: 0,
-    enemyType: null,
-    enemyHp: 0,
-    collected: false
-  };
-
   return tiles;
 }
 
@@ -247,8 +256,10 @@ function terrainFromBiome(biome, activeRules, mapX, mapY, row, col) {
     return TERRAIN.SNOW;
   }
 
-  if (value < 8) return TERRAIN.WALL;
-
+  if (ids.has("wall_terrain") && value < 8) {
+    return TERRAIN.WALL;
+  }
+  
   return TERRAIN.FLOOR;
 }
 
@@ -339,4 +350,95 @@ function seededValue(x, y, row, col, salt) {
   }
 
   return Math.abs(hash) % 100;
+}
+
+function ensureNewRuleVisible({ tiles, rule, activeRules }) {
+  if (!rule) return;
+
+  const size = tiles.length;
+  const center = Math.floor(size / 2);
+  const tile = findSafeVisibleTile(tiles, center);
+
+  if (!tile) return;
+
+  const ids = new Set(activeRules.map((activeRule) => activeRule.id));
+
+  if (rule.id === "wall_terrain") {
+    tile.terrain = TERRAIN.WALL;
+    tile.object = OBJECT.NONE;
+    return;
+  }
+
+  if (rule.id.startsWith("score_")) {
+    const value = Number(rule.id.replace("score_", ""));
+    tile.object = OBJECT.COIN;
+    tile.scoreValue = value;
+    tile.collected = false;
+    return;
+  }
+
+  if (rule.id === "health") {
+    tile.object = OBJECT.HEAL;
+    tile.collected = false;
+    return;
+  }
+
+  if (rule.id === "grass_biome") tile.terrain = TERRAIN.GRASS;
+  if (rule.id === "tall_grass") tile.terrain = TERRAIN.TALL_GRASS;
+  if (rule.id === "flower_field") tile.terrain = TERRAIN.FLOWER;
+
+  if (rule.id === "water_biome") tile.terrain = TERRAIN.WATER;
+  if (rule.id === "deep_water") tile.terrain = TERRAIN.DEEP_WATER;
+  if (rule.id === "reed_field") tile.terrain = TERRAIN.REED;
+
+  if (rule.id === "desert_biome") tile.terrain = TERRAIN.DESERT;
+  if (rule.id === "sand_dune") tile.terrain = TERRAIN.DUNE;
+  if (rule.id === "cactus_field") tile.terrain = TERRAIN.CACTUS;
+
+  if (rule.id === "snow_biome") tile.terrain = TERRAIN.SNOW;
+  if (rule.id === "ice_floor") tile.terrain = TERRAIN.ICE;
+  if (rule.id === "frost_field") tile.terrain = TERRAIN.FROST;
+
+  if (rule.id === "grass_enemy_1") {
+    tile.terrain = TERRAIN.GRASS;
+    setEnemy(tile, "grass_slime");
+  }
+
+  if (rule.id === "water_enemy_1") {
+    tile.terrain = TERRAIN.WATER;
+    setEnemy(tile, "water_drop");
+  }
+
+  if (rule.id === "desert_enemy_1") {
+    tile.terrain = TERRAIN.DESERT;
+    setEnemy(tile, "sand_worm");
+  }
+
+  if (rule.id === "snow_enemy_1") {
+    tile.terrain = TERRAIN.SNOW;
+    setEnemy(tile, "snow_ball");
+  }
+
+  if (rule.id === "attack_item" || rule.id === "water_boots" || rule.id === "wall_breaker") {
+    tile.object = OBJECT.ITEM;
+    tile.collected = false;
+  }
+}
+
+function findSafeVisibleTile(tiles, center) {
+  for (let row = 0; row < tiles.length; row += 1) {
+    for (let col = 0; col < tiles.length; col += 1) {
+      if (row === center && col === center) continue;
+      return tiles[row][col];
+    }
+  }
+
+  return null;
+}
+
+function setEnemy(tile, enemyType) {
+  tile.object = OBJECT.ENEMY;
+  tile.enemyType = enemyType;
+  tile.enemyHp = 1;
+  tile.collected = false;
 }
