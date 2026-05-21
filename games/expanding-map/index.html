@@ -5,47 +5,50 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>One More Rule</title>
   <link rel="stylesheet" href="../../shared/common.css" />
-  <link rel="stylesheet" href="../../shared/game-layout.css" />
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
-      background: radial-gradient(circle at top, #172033 0%, #08111f 55%, #050914 100%);
+      min-height: 100dvh;
+      background: radial-gradient(circle at top, #172033 0%, #08111f 58%, #050914 100%);
       color: #f8fafc;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
-    .game-page {
+    .omr-page {
       width: min(100%, 760px);
       margin: 0 auto;
       padding: 18px 14px 28px;
-      box-sizing: border-box;
     }
 
-    .top-bar {
+    .omr-top {
       display: flex;
-      align-items: center;
       justify-content: space-between;
+      align-items: center;
       gap: 12px;
-      margin-bottom: 14px;
+      margin-bottom: 10px;
     }
 
-    h1 {
+    .omr-title {
       margin: 0;
       text-align: center;
-      font-size: clamp(32px, 8vw, 54px);
+      font-size: clamp(36px, 9vw, 56px);
       line-height: 1;
       letter-spacing: -1px;
     }
 
-    h1 span {
+    .omr-title span {
       color: #60a5fa;
     }
 
-    .subtitle {
-      margin: 8px 0 18px;
+    .omr-subtitle {
+      margin: 10px 0 18px;
       text-align: center;
       color: #cbd5e1;
-      font-weight: 600;
+      font-weight: 700;
     }
 
     button {
@@ -56,65 +59,59 @@
       color: white;
       font-weight: 800;
       cursor: pointer;
-      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.22);
     }
 
-    .icon-btn {
-      min-width: 54px;
+    .omr-menu-btn {
+      width: 54px;
       height: 54px;
       padding: 0;
-      font-size: 24px;
       background: rgba(15, 23, 42, 0.9);
-      box-shadow: none;
+      font-size: 24px;
     }
 
-    .stats {
+    .omr-stats {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 12px;
       margin-bottom: 12px;
     }
 
-    .stat-card,
-    .rule-card,
-    .controls-panel {
+    .omr-card {
       border: 1px solid #334155;
       border-radius: 16px;
       background: rgba(15, 23, 42, 0.78);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 14px 35px rgba(0,0,0,0.25);
-      backdrop-filter: blur(6px);
+      box-shadow: 0 14px 35px rgba(0, 0, 0, 0.25);
     }
 
-    .stat-card {
+    .omr-stat {
       padding: 14px;
       text-align: center;
     }
 
-    .stat-label {
+    .omr-stat-label {
       color: #e2e8f0;
       font-weight: 800;
       font-size: 14px;
     }
 
-    .stat-value {
+    .omr-stat-value {
       margin-top: 6px;
       color: #60a5fa;
       font-size: 28px;
       font-weight: 900;
     }
 
-    .rule-card {
+    .omr-rule {
       display: flex;
       gap: 14px;
       align-items: center;
       padding: 14px;
       margin-bottom: 18px;
-      text-align: left;
     }
 
-    .rule-icon {
-      flex: 0 0 54px;
-      height: 54px;
+    .omr-rule-icon {
+      flex: 0 0 56px;
+      height: 56px;
       display: grid;
       place-items: center;
       border-radius: 14px;
@@ -122,43 +119,44 @@
       font-size: 28px;
     }
 
-    .rule-title {
+    .omr-rule-title {
       color: #60a5fa;
       font-weight: 900;
       margin-bottom: 4px;
     }
 
-    .rule-desc {
+    .omr-rule-desc {
       color: #e5e7eb;
       font-size: 14px;
       line-height: 1.45;
+      word-break: keep-all;
     }
 
-    .board-wrap {
+    .omr-board-wrap {
       display: flex;
       justify-content: center;
-      margin: 0 auto 18px;
+      margin-bottom: 18px;
     }
 
-    canvas {
+    #gameCanvas {
+      display: block;
       width: min(100%, 520px);
+      height: auto;
       aspect-ratio: 1 / 1;
       background: #0f172a;
       border: 2px solid #334155;
       border-radius: 14px;
-      image-rendering: pixelated;
+      box-shadow: 0 16px 45px rgba(0, 0, 0, 0.35);
       touch-action: none;
-      box-shadow: 0 16px 45px rgba(0,0,0,0.35);
     }
 
-    .controls-panel {
+    .omr-controls-panel {
       width: min(100%, 520px);
       margin: 0 auto;
       padding: 16px;
-      box-sizing: border-box;
     }
 
-    .controls-title {
+    .omr-controls-title {
       color: #60a5fa;
       font-size: 20px;
       font-weight: 900;
@@ -166,15 +164,16 @@
       margin-bottom: 6px;
     }
 
-    .message {
+    .omr-message {
       min-height: 22px;
       text-align: center;
       color: #cbd5e1;
       font-size: 14px;
       margin-bottom: 14px;
+      word-break: keep-all;
     }
 
-    .controls {
+    .omr-controls {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 10px;
@@ -184,73 +183,69 @@
       background: rgba(15, 23, 42, 0.75);
     }
 
-    .controls button {
+    .omr-controls button {
       height: 56px;
       font-size: 24px;
       border-radius: 12px;
     }
 
-    .controls .empty {
+    .omr-controls .empty {
       visibility: hidden;
     }
 
     @media (max-width: 520px) {
-      .stats {
+      .omr-stats {
         grid-template-columns: 1fr;
       }
 
-      .top-bar {
-        align-items: flex-start;
-      }
-
-      .rule-card {
+      .omr-rule {
         align-items: flex-start;
       }
     }
   </style>
 </head>
 <body>
-  <main class="game-page">
-    <div class="top-bar">
-      <button id="backBtn" class="icon-btn">☰</button>
+  <main class="omr-page">
+    <div class="omr-top">
+      <button id="backBtn" class="omr-menu-btn">☰</button>
       <button id="resetBtn">↻ 다시 시작</button>
     </div>
 
-    <h1>One More <span>Rule</span></h1>
-    <p class="subtitle">한 칸 너머, 새로운 규칙이 추가됩니다</p>
+    <h1 class="omr-title">One More <span>Rule</span></h1>
+    <p class="omr-subtitle">한 칸 너머, 새로운 규칙이 추가됩니다</p>
 
-    <section class="stats">
-      <div class="stat-card">
-        <div class="stat-label">현재 맵</div>
-        <div id="mapInfo" class="stat-value">0, 0</div>
+    <section class="omr-stats">
+      <div class="omr-card omr-stat">
+        <div class="omr-stat-label">현재 맵</div>
+        <div id="mapInfo" class="omr-stat-value">0, 0</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-label">점수</div>
-        <div id="scoreInfo" class="stat-value">0</div>
+      <div class="omr-card omr-stat">
+        <div class="omr-stat-label">점수</div>
+        <div id="scoreInfo" class="omr-stat-value">0</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-label">누적 규칙</div>
-        <div id="ruleCountInfo" class="stat-value">0개</div>
+      <div class="omr-card omr-stat">
+        <div class="omr-stat-label">누적 규칙</div>
+        <div id="ruleCountInfo" class="omr-stat-value">0개</div>
       </div>
     </section>
 
-    <section class="rule-card">
-      <div id="ruleIcon" class="rule-icon">▫️</div>
+    <section class="omr-card omr-rule">
+      <div id="ruleIcon" class="omr-rule-icon">▫️</div>
       <div>
-        <div id="ruleInfo" class="rule-title">기본 규칙</div>
-        <div id="featureList" class="rule-desc">아직 추가된 규칙이 없습니다.</div>
+        <div id="ruleInfo" class="omr-rule-title">기본 규칙</div>
+        <div id="featureList" class="omr-rule-desc">아직 추가된 규칙이 없습니다.</div>
       </div>
     </section>
 
-    <div class="board-wrap">
+    <div class="omr-board-wrap">
       <canvas id="gameCanvas" width="500" height="500"></canvas>
     </div>
 
-    <section class="controls-panel">
-      <div class="controls-title">조작 방법</div>
-      <div id="message" class="message">방향키 또는 아래 버튼으로 이동하세요.</div>
+    <section class="omr-card omr-controls-panel">
+      <div class="omr-controls-title">조작 방법</div>
+      <div id="message" class="omr-message">방향키 또는 아래 버튼으로 이동하세요.</div>
 
-      <div class="controls">
+      <div class="omr-controls">
         <button class="empty">-</button>
         <button data-dir="up">⬆</button>
         <button class="empty">-</button>
