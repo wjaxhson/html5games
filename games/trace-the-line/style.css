@@ -372,14 +372,3 @@
 
   .shake { animation: shake 0.3s ease; }
 
-  .back-link {
-    align-self: flex-start;
-    color: var(--muted);
-    text-decoration: none;
-    font-size: 13px;
-    padding: 4px 2px;
-  }
-  
-  .back-link:hover {
-    color: var(--text);
-  }

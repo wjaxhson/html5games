@@ -19,7 +19,6 @@ const featureListEl = document.getElementById("featureList");
 const messageEl = document.getElementById("message");
 const menuBarEl = document.getElementById("menuBar");
 
-const backBtn = document.getElementById("backBtn");
 const resetBtn = document.getElementById("resetBtn");
 
 let isMapViewOpen = false;
@@ -654,10 +653,6 @@ document.querySelectorAll("[data-dir]").forEach((button) => {
     if (dir === "left") movePlayer(-1, 0);
     if (dir === "right") movePlayer(1, 0);
   });
-});
-
-backBtn.addEventListener("click", () => {
-  window.location.href = "../../index.html";
 });
 
 resetBtn.addEventListener("click", () => {
