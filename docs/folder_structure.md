@@ -11,19 +11,14 @@ root/
 │   │   ├─ index.html
 │   │   ├─ game.js
 │   │   ├─ style.css
+│   │   ├─ meta.json
 │   │   └─ thumbnail.png
 │   │
-│   ├─ horse-racing/
-│   │   ├─ index.html
-│   │   ├─ game.js
-│   │   ├─ style.css
-│   │   └─ assets/
+│   ├─ upgrade-clicker/
+│   │   ├─ ...
 │   │
 │   └─ moon-game/
-│       ├─ index.html
-│       ├─ game.js
-│       ├─ style.css
-│       └─ assets/
+│   ├─ ...
 │
 ├─ shared/
 │   ├─ firebase.js
