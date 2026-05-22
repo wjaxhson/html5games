@@ -17,15 +17,15 @@ root/
 │   ├─ upgrade-clicker/
 │   │   ├─ ...
 │   │
-│   └─ moon-game/
+│   ├─ ctystal-miner/
+│   │   ├─ ...
 │   ├─ ...
 │
 ├─ shared/
 │   ├─ firebase.js
-│   ├─ auth.js
 │   ├─ save.js
 │   ├─ game-list.js
-│   └─ ui.js
+│   ├─ ...
 │
 └─ docs/
 ```
