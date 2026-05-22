@@ -2,6 +2,21 @@
 
 이 문서는 AI가 HTML5Games 프로젝트를 이어서 작업할 때 참고하는 내부 작업 기준이다.
 
+## 작업 시작 전 필수 확인
+
+이 프로젝트에서 작업 시작 전 반드시 수행:
+
+1. 최신 GitHub 저장소 구조 확인
+2. docs/project_overview.md 확인
+3. docs/ai_context.md 확인
+4. docs/todo.md 확인
+5. shared/game-list.js 확인
+6. 현재 games/ 폴더 목록 확인
+
+위 확인 없이 구조를 추론하지 말 것.
+기억 기반으로 "안 되어 있음" 판단 금지.
+실제 파일 기준으로만 판단.
+
 ## 저장소
 
 GitHub Repository:
@@ -17,150 +32,123 @@ https://html5games-a4y.pages.dev/
 - GitHub 연결
 - Cloudflare Pages 배포
 - Firebase Google 로그인
-- Firestore 저장/불러오기
+- Firestore 저장/불러오기 구조 정리
 - 루트 런처 페이지
 - 게임 목록 자동 렌더링
-- shared/game-list.js
-- shared/common.css
-- shared/game-layout.css
-- shared/save.js
-- shared/save-ui.js
-- shared/save-ui.css
+- `shared/game-list.js`
+- `shared/common.css`
+- `shared/game-layout.css`
+- 게임별 `meta.json` 기반 목록 표시
 
 ### 현재 게임
 
-- games/simple-clicker/
-- games/upgrade-clicker/
-- games/crystal-miner/
-- games/trace-the-line/
-- games/more-dots/
-- games/stroop-test/
-- games/path-memory/
-- games/expanding-map/
+- `games/simple-clicker/`
+- `games/upgrade-clicker/`
+- `games/crystal-miner/`
+- `games/trace-the-line/`
+- `games/more-dots/`
+- `games/stroop-test/`
+- `games/path-memory/`
+- `games/expanding-map/`
 
 ## 핵심 구조
 
-루트 index.html은 게임 화면이 아니라 런처 페이지다.
+루트 `index.html`은 게임 화면이 아니라 런처 페이지다.
 
-게임 목록은 shared/game-list.js에서 관리한다.
+게임 목록은 `shared/game-list.js`에서 관리한다.
 
-정적 사이트 환경에서는 games/ 폴더 자동 스캔이 불가능하므로,
-게임을 추가할 때는 반드시 shared/game-list.js에 등록한다.
+정적 사이트 환경에서는 `games/` 폴더 자동 스캔이 불가능하므로,
+게임을 추가할 때는 반드시 `shared/game-list.js`의 `gameFolders` 배열에 등록한다.
+
+각 게임의 제목, 설명, 표시 여부는 각 게임 폴더의 `meta.json`에서 관리한다.
 
 ## 게임 목록 규칙
 
 ```js
-export const games = [
-  {
-    id: "simple-clicker",
-    title: "Simple Clicker",
-    description: "가장 기본적인 클릭 게임",
-    visible: true
-  }
+export const gameFolders = [
+  "simple-clicker",
+  "upgrade-clicker",
+  "crystal-miner",
+  "trace-the-line",
+  "more-dots",
+  "stroop-test",
+  "path-memory",
+  "expanding-map"
 ];
 ```
 
-path, thumbnail은 직접 적지 않는다.
+각 게임 폴더에는 반드시 `meta.json`을 둔다.
 
-```js
-const gamePath = `./games/${game.id}/`;
-const thumbnailPath = `./games/${game.id}/thumbnail.png`;
+```json
+{
+  "title": "Simple Clicker",
+  "description": "가장 기본적인 클릭 게임",
+  "visible": true
+}
 ```
 
-## 저장 시스템 규칙
+- `visible: false`인 게임은 목록에서 숨긴다.
+- `meta.json`이 없거나 잘못되면 해당 게임은 목록에 표시되지 않는다.
+- `gameFolders`에는 실제 존재하는 게임 폴더명만 넣는다.
 
-공용 저장 모듈은 shared/save.js를 사용한다.
+## 게임 폴더 기본 구조
 
-각 게임은 createSaveManager()를 사용해서 저장/불러오기를 처리한다.
+```txt
+games/game-id/
+├─ index.html
+├─ meta.json
+├─ style.css
+└─ game.js
+```
 
-Firestore 경로:
+게임에 따라 파일이 더 추가될 수 있다.
 
+## 공용 파일
+
+```txt
+shared/
+├─ common.css
+├─ firebase.js
+├─ game-layout.css
+├─ game-list.js
+└─ default-thumbnail.png
+```
+
+## 저장 구조
+
+Firebase 로그인 상태에서는 Firestore 저장을 사용한다.
+
+기본 저장 경로:
+
+```txt
 users/{uid}/games/{gameId}
+```
 
-localStorage key:
+비로그인 상태에서는 localStorage 저장을 사용한다.
 
+기본 localStorage 키:
+
+```txt
 html5games:{gameId}:save
-
-기본 저장 정책:
-
-- 게임 진입 시 자동 불러오기
-- 30초마다 자동 저장
-- 수동 저장 버튼 지원
-- 로그인 상태: Firestore
-- 비로그인 상태: localStorage
-
-저장 UI는 shared/save-ui.js의 createSaveUI()를 사용한다.
-
-save-ui 기능:
-- 저장 버튼
-- 저장 상태 표시
-- 자동 저장 남은 시간 표시
-
-각 게임은 saveManager.save()만 연결한다.
-
-기존 saveButton 방식은 사용하지 않는다.
-
-## 게임 페이지 규칙
-
-각 게임은 독립 실행 가능해야 한다.
-
-공통 CSS 연결:
-
-```html
-<link rel="stylesheet" href="../../shared/common.css">
-<link rel="stylesheet" href="../../shared/game-layout.css">
-<link rel="stylesheet" href="./style.css">
-<link rel="stylesheet" href="../../shared/save-ui.css">
-```
-save-ui.css는 가장 마지막에 로드한다.
-(게임별 CSS 충돌 방지)
-
-기본 HTML 구조:
-
-```html
-<body class="game-page">
-  <main class="game-container">
-    <header class="game-header">
-      <h1 class="game-title">게임 제목</h1>
-      <a class="game-back-link" href="../../index.html">← 게임 목록</a>
-    </header>
-
-    <section class="game-panel">
-      <!-- 게임 UI -->
-    </section>
-
-    <section class="game-panel game-status">
-      <!-- 저장 상태 -->
-    </section>
-  </main>
-
-  <script type="module" src="./game.js"></script>
-</body>
 ```
 
-메인 페이지 게임 카드는 아래 구조를 유지한다:
+## 개발 방향
 
-```html
-<a class="game-card">
-  <img class="game-thumbnail">
-  <div class="game-info">
-```
+- 무료 인프라 우선
+- 모바일 대응 고려
+- 서버 비용 최소화
+- 유지보수 단순화
+- 게임별 독립성 유지
+- 공용 기능은 `shared/`로 분리
+- 새 게임은 작은 단위로 빠르게 추가
+- 문서와 실제 코드 상태가 다르면 실제 코드 기준으로 판단 후 문서 수정
 
-thumbnail.png가 없으면:
+## AI 작업 주의사항
 
-```html
-onerror="this.onerror=null; this.src='./assets/default-thumbnail.png';"
-```
-
-## 작업 시작 전 필수 확인
-
-1. 최신 GitHub 저장소 구조 확인
-2. docs/project_overview.md 확인
-3. docs/ai_context.md 확인
-4. docs/todo.md 확인
-5. shared/game-list.js 확인
-6. 현재 games/ 폴더 목록 확인
-
-위 확인 없이 구조를 추론하지 말 것.
-기억 기반으로 "안 되어 있음" 판단 금지.
-실제 파일 기준으로만 판단.
+- 이전 대화 기억만으로 현재 상태를 판단하지 말 것.
+- 반드시 최신 GitHub 문서와 코드를 먼저 확인할 것.
+- `docs/` 문서가 최신인지 실제 코드와 비교할 것.
+- 사용자가 “최신 문서 확인”을 요청하면 추론하지 말고 실제 파일을 다시 확인할 것.
+- 이미 구현된 기능을 “없다”고 단정하지 말 것.
+- 수정 제안 시 어느 파일을 어떻게 바꿀지 명확히 제시할 것.
+- 코드나 문서 전문을 요청받으면 복사해서 바로 붙여넣을 수 있게 한 덩어리로 제공할 것.
