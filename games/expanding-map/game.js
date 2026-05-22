@@ -324,7 +324,19 @@ function resetAfterDeath() {
   setTimeout(resetGame, 300);
 }
 
+function resizeCanvas() {
+  const rect = canvas.getBoundingClientRect();
+  const size = Math.floor(rect.width);
+
+  if (canvas.width !== size || canvas.height !== size) {
+    canvas.width = size;
+    canvas.height = size;
+  }
+}
+
 function draw() {
+  resizeCanvas();
+  
   if (isMapViewOpen) {
     drawWorldMap();
     updateInfo();
