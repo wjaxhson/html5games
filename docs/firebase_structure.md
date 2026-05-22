@@ -1,25 +1,27 @@
 # Firebase 구조
 
 ## Authentication
-- Google 로그인 사용
+
+- Firebase Google 로그인 사용
 
 ## Firestore 구조
 
-saves/
-└─ uid
-    ├─ horse-racing
-    ├─ moon-game
-    └─ ...
+```txt
+users/{uid}/games/{gameId}
 
-## 저장 데이터 예시
+예시:
 
-{
-  stage: 5,
-  gold: 1200,
-  hp: 30,
-  updatedAt: 123456789
-}
+users/abcd1234/games/simple-clicker
+```
+
+## localStorage 구조
+
+html5games:{gameId}:save
 
 ## 저장 정책
-- 로그인 유저만 클라우드 저장
-- 비로그인 상태는 localStorage 임시 저장 가능
+
+로그인 상태: Firestore 저장
+비로그인 상태: localStorage 저장
+게임 진입 시 자동 불러오기
+기본 30초마다 자동 저장
+수동 저장 지원
