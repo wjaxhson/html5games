@@ -53,3 +53,8 @@ games/
 - Simple Clicker
 - Upgrade Clicker
 - Crystal Miner
+- Trace The Line
+- More Dots
+- Stroop Test
+- Path Memory
+- Expanding Map
