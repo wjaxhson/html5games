@@ -303,9 +303,31 @@ button {
 @media (max-width: 520px) {
   .omr-page {
     width: 100%;
+    padding: 8px;
+    gap: 6px;
   }
 
-  .omr-stats {
-    grid-template-columns: repeat(3, 1fr);
+  .omr-title {
+    font-size: 24px;
+  }
+
+  .omr-stat {
+    padding: 6px;
+  }
+
+  .omr-stat-value {
+    font-size: 16px;
+  }
+
+  #gameCanvas {
+    width: min(100%, 48dvh, calc(100vw - 16px));
+  }
+
+  .omr-controls-panel {
+    padding: 6px;
+  }
+
+  .omr-controls button {
+    height: 38px;
   }
 }
