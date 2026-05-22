@@ -32,6 +32,11 @@ https://html5games-a4y.pages.dev/
 - games/simple-clicker/
 - games/upgrade-clicker/
 - games/crystal-miner/
+- games/trace-the-line/
+- games/more-dots/
+- games/stroop-test/
+- games/path-memory/
+- games/expanding-map/
 
 ## 핵심 구조
 
@@ -147,6 +152,15 @@ thumbnail.png가 없으면:
 onerror="this.onerror=null; this.src='./assets/default-thumbnail.png';"
 ```
 
-## 다음 작업 우선순위
+## 작업 시작 전 필수 확인
 
-1. 새 게임 추가
+1. 최신 GitHub 저장소 구조 확인
+2. docs/project_overview.md 확인
+3. docs/ai_context.md 확인
+4. docs/todo.md 확인
+5. shared/game-list.js 확인
+6. 현재 games/ 폴더 목록 확인
+
+위 확인 없이 구조를 추론하지 말 것.
+기억 기반으로 "안 되어 있음" 판단 금지.
+실제 파일 기준으로만 판단.
