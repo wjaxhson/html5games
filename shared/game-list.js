@@ -1,7 +1,6 @@
 export const gameFolders = [
   "simple-clicker",
   "upgrade-clicker",
-  "test-game",
   "crystal-miner",
   "trace-the-line",
   "more-dots",
