@@ -63,11 +63,17 @@ function neighbors(r,c){
 
 function buildBoard(){
   const board=document.getElementById('board');
-  board.style.gridTemplateColumns=`repeat(${cols},28px)`;
+  const wrap=document.getElementById('board-wrap');
+  // Fill available width: board-wrap padding=8px each side
+  const avail=Math.max(wrap.clientWidth,280)-16;
+  const cellSize=Math.max(24,Math.min(40,Math.floor(avail/cols)));
+  board.style.gridTemplateColumns=`repeat(${cols},${cellSize}px)`;
   board.innerHTML='';
   for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
     const cell=document.createElement('div');
     cell.className='cell';
+    cell.style.width=cellSize+'px';cell.style.height=cellSize+'px';
+    cell.style.fontSize=Math.max(10,cellSize-12)+'px';
     cell.dataset.r=r;cell.dataset.c=c;
     cell.addEventListener('click',()=>open(r,c));
     // 길게 누르기 = 깃발

@@ -17,7 +17,7 @@ btns.forEach(b=>b.addEventListener('click',()=>{if(accepting)playerPress(+b.data
 function startGame(){
   ['start-screen','result-screen'].forEach(id=>document.getElementById(id).classList.remove('active'));
   document.getElementById('game-screen').classList.add('active');
-  sequence=[];round=0;showing=false;accepting=false;
+  sequence=[];round=0;playerIdx=0;showing=false;accepting=false;
   setStatus('준비 중...');
   setTimeout(nextRound,800);
 }
@@ -78,8 +78,3 @@ async function endGame(){
   },800);
 }
 
-// init playerIdx
-document.getElementById('game-screen').addEventListener('transitionend',()=>{playerIdx=0;});
-// reset playerIdx at start
-function resetPlayerIdx(){playerIdx=0;}
-const origStart=startGame;

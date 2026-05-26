@@ -5,7 +5,7 @@ const ctx=canvas.getContext('2d');
 const W=360,H=480;
 canvas.width=W;canvas.height=H;
 
-let score,best,lives,wave,player,bullets,aliens,abombs,particles,running,rafId;
+let score,best,lives,wave,player,bullets,aliens,particles,running,rafId;
 let alienDir,alienSpeed,alienDropY,alienShootTimer;
 const keys={};
 
@@ -38,7 +38,7 @@ function initGame(){
   document.getElementById('overlay').classList.add('hidden');
   score=0;lives=3;wave=1;running=true;
   player={x:W/2,y:H-36,w:36,h:16,speed:4};
-  bullets=[];abombs=[];particles=[];
+  bullets=[];particles=[];
   spawnAliens();
   cancelAnimationFrame(rafId);
   rafId=requestAnimationFrame(loop);
@@ -101,10 +101,21 @@ function update(dt){
   const alive=aliens.filter(a=>a.alive);
   if(!alive.length){wave++;spawnAliens();return;}
 
-  const minX=Math.min(...alive.map(a=>a.x-a.w/2));
-  const maxX=Math.max(...alive.map(a=>a.x+a.w/2));
+  // Move first, then check new positions and snap to wall (prevents repeated drop)
   alive.forEach(a=>a.x+=alienDir*alienSpeed);
-  if(maxX>=W-4||minX<=4){alienDir*=-1;alive.forEach(a=>a.y+=16);}
+  const newMinX=Math.min(...alive.map(a=>a.x-a.w/2));
+  const newMaxX=Math.max(...alive.map(a=>a.x+a.w/2));
+  if(newMaxX>W-4){
+    const over=newMaxX-(W-4);
+    alive.forEach(a=>a.x-=over);
+    alienDir=-1;
+    alive.forEach(a=>a.y+=20);
+  } else if(newMinX<4){
+    const over=4-newMinX;
+    alive.forEach(a=>a.x+=over);
+    alienDir=1;
+    alive.forEach(a=>a.y+=20);
+  }
 
   if(alive.some(a=>a.y+a.h/2>=H-50)){endGame();return;}
 
@@ -113,8 +124,7 @@ function update(dt){
   if(alienShootTimer>Math.max(40,90-wave*8)){
     alienShootTimer=0;
     const shooter=alive[Math.floor(Math.random()*alive.length)];
-    abombs.push({x:shooter.x,y:shooter.y,vy:3+wave*0.3,player:false,w:4,h:10});
-    bullets.push(abombs[abombs.length-1]);
+    bullets.push({x:shooter.x,y:shooter.y,vy:3+wave*0.3,player:false,w:4,h:10});
   }
 
   // Particles

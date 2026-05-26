@@ -20,9 +20,9 @@ body{background:#0f172a;color:#f8fafc;font-family:system-ui,sans-serif;min-heigh
 .hud-label{font-size:12px;color:#64748b}
 .hud-val{font-size:18px;font-weight:800;color:#f59e0b}
 .hud-btn{width:44px;height:44px;border:none;border-radius:10px;background:#334155;color:#f8fafc;font-size:20px;cursor:pointer;flex-shrink:0}
-#board-wrap{width:100%;overflow:auto}
+#board-wrap{width:100%;overflow:auto;display:flex;justify-content:center}
 #board{display:inline-grid;gap:2px;padding:8px;background:#1e293b;border-radius:12px;border:1px solid #334155}
-.cell{width:28px;height:28px;border-radius:4px;background:#334155;border:none;cursor:pointer;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;user-select:none;transition:background .1s}
+.cell{border-radius:4px;background:#334155;border:none;cursor:pointer;font-weight:700;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;user-select:none;transition:background .1s}
 .cell:active{background:#475569}
 .cell.open{background:#0f172a;cursor:default}
 .cell.mine{background:#7f1d1d}

@@ -65,19 +65,23 @@ function onTap(){
   for(const n of notes){
     if(!n.alive||n.hit)continue;
     const diff=Math.abs(n.r-TARGET_R);
-    if(diff<=16){
+    if(diff<=30){  // 넓은 판정 창
       n.hit=true;n.alive=false;
-      const pts=diff<=4?300:diff<=8?200:100;
-      const label=diff<=4?'🎯 PERFECT!':diff<=8?'✅ GREAT!':'👍 GOOD';
+      const pts=diff<=6?300:diff<=15?200:100;
+      const label=diff<=6?'🎯 PERFECT!':diff<=15?'✅ GREAT!':'👍 GOOD';
       score+=pts*(1+Math.floor(combo/5));combo++;
       level=1+Math.floor(score/1000);
-      showFeedback(label,diff<=4?'#fbbf24':'#34d399');
+      showFeedback(label,diff<=6?'#fbbf24':'#34d399');
       updateHUD();tapped=true;
       if(score>(best??0)){best=score;saveManager.save();}
       break;
     }
   }
-  if(!tapped&&notes.some(n=>n.alive&&!n.hit)){showFeedback('❌ MISS','#f87171');loseLife();}
+  // 빈 탭 미스: 노트가 이미 판정 창을 지나쳐 사라진 경우에만 감점
+  if(!tapped){
+    const nearMissed=notes.some(n=>n.alive&&!n.hit&&n.r<TARGET_R-32);
+    if(nearMissed){showFeedback('❌ MISS','#f87171');loseLife();}
+  }
 }
 
 function miss(n){n.alive=false;showFeedback('❌ MISS','#f87171');loseLife();}
