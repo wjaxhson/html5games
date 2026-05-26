@@ -88,9 +88,15 @@ function update(dt){
   if(ball.x-ball.r<0){ball.x=ball.r;ball.vx*=-0.7;}
   if(ball.x+ball.r>camX+W){ball.x=camX+W-ball.r;ball.vx*=-0.7;}
 
-  // camera follow
+  // camera follow — 오른쪽 우선, 단 매달린 기둥은 항상 화면에 유지
   const target=ball.x-W*0.35;
   if(target>camX)camX+=(target-camX)*0.08;
+  if(rope){
+    const poleScreen=rope.pole.x-camX;
+    if(poleScreen<40) camX=Math.max(0,rope.pole.x-40);
+    else if(poleScreen>W-40) camX=rope.pole.x-(W-40);
+  }
+  camX=Math.max(0,camX);
 
   // score = furthest x
   const dist=Math.floor((ball.x-80)/60);

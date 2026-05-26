@@ -124,44 +124,38 @@ function update(){
 function snap(hitR,hitC){
   if(!projectile) return;
   const color=projectile.color;
+  // 실제 위치를 null 처리 전에 저장 (angle 기반 추정 대신 실제 좌표 사용)
+  const projX=projectile.x, projY=projectile.y;
   projectile=null;
 
   let br=-1,bc=-1,bestDist=Infinity;
 
   if(hitR===-1){
-    // Ceiling hit: place in nearest empty slot of row 0
+    // 천장 충돌: row 0에서 실제 X에 가장 가까운 빈 슬롯
     if(!grid[0]) grid[0]=[];
-    const rc=rowCols(0);
-    for(let c=0;c<rc;c++){
-      if(grid[0][c]) continue;
-      const d=Math.abs(W/2+Math.cos(angle)*9*100 - colX(c,0)); // rough angle hint
-      // Use actual projectile X (already null'd) — use cannon center X
-      // Just pick nearest to cannon center
-      if(bestDist===Infinity){ br=0; bc=c; bestDist=0; } // first empty
-    }
-    // More precisely: pick empty slot in row 0 nearest to where projectile stopped (y≈0)
-    // Since projectile is null now, use the last known position approximation
-    // Actually let's just find nearest to the angle-projected x
-    const targetX=W/2+Math.cos(angle)*(H-40); // rough x when it hits ceiling
-    bestDist=Infinity;
     for(let c=0;c<rowCols(0);c++){
       if(grid[0]&&grid[0][c]) continue;
-      const d=Math.abs(targetX-colX(c,0));
+      const d=Math.abs(projX-colX(c,0));
       if(d<bestDist){bestDist=d;br=0;bc=c;}
     }
     if(br===-1){
-      // Row 0 full → prepend new row
+      // row 0이 꽉 찬 경우 새 행 추가
       grid.unshift([]);
+      bestDist=Infinity;
       for(let c=0;c<rowCols(0);c++){
-        const d=Math.abs(targetX-colX(c,0));
+        const d=Math.abs(projX-colX(c,0));
         if(d<bestDist){bestDist=d;br=0;bc=c;}
       }
     }
   } else {
-    // Bubble hit: find the empty neighbor of [hitR,hitC] closest to impact point
-    // Compute approximate impact point (between projectile start and hit bubble center)
-    const impactX=colX(hitC,hitR)+(Math.cos(angle+Math.PI)*R);
-    const impactY=rowY(hitR)+(Math.sin(angle+Math.PI)*R);
+    // 버블 충돌: 실제 발사체 위치 기준으로 충돌점 계산
+    // (angle 대신 projectile 실제 좌표 사용 → 벽 반사 후에도 정확함)
+    const dx=projX-colX(hitC,hitR);
+    const dy=projY-rowY(hitR);
+    const dlen=Math.hypot(dx,dy)||1;
+    // 충돌점 = 맞은 버블 표면에서 발사체 방향
+    const impactX=colX(hitC,hitR)+(dx/dlen)*R;
+    const impactY=rowY(hitR)+(dy/dlen)*R;
 
     const even=hitR%2===0;
     const cands=[
@@ -177,18 +171,17 @@ function snap(hitR,hitC){
       if(nr<0||nc<0) continue;
       const rc=rowCols(nr);
       if(nc>=rc) continue;
-      // Empty if row doesn't exist OR slot is null/undefined
       const isEmpty=!grid[nr]||!grid[nr][nc];
       if(!isEmpty) continue;
       const d=dist(impactX,impactY,colX(nc,nr),rowY(nr));
       if(d<bestDist){bestDist=d;br=nr;bc=nc;}
     }
 
-    // Fallback (no empty neighbor found – very dense grid)
+    // 빈 이웃 없음 (빽빽한 경우) — fallback
     if(br===-1){br=hitR;bc=hitC;}
   }
 
-  // Ensure the row array exists
+  // 행 배열 확보
   while(grid.length<=br) grid.push([]);
   if(!grid[br]) grid[br]=[];
   grid[br][bc]=color;
