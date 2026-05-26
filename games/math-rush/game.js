@@ -27,15 +27,38 @@ function tick(){
   if(timeLeft<=0)endGame();
 }
 
+// 난이도 단계: 맞춘 개수 기준
+// 0~4: 덧셈·뺄셈(소수)
+// 5~11: 덧셈·뺄셈(큰수) + 곱셈
+// 12~19: 위 + 나눗셈
+// 20+: 모든 연산 + 큰 수 범위
+function getDiffLevel(){
+  if(correct>=20)return 3;
+  if(correct>=12)return 2;
+  if(correct>=5)return 1;
+  return 0;
+}
+
 function genQuestion(){
+  const lv=getDiffLevel();
   const ops=['+','-','×','÷'];
-  const op=ops[Math.floor(Math.random()*(score>100?4:score>40?3:2))];
+  const opCount=lv>=3?4:lv>=2?4:lv>=1?3:2;
+  const op=ops[Math.floor(Math.random()*opCount)];
   let a,b,ans;
-  if(op==='+'){a=rnd(1,50);b=rnd(1,50);ans=a+b;}
-  else if(op==='-'){a=rnd(10,60);b=rnd(1,a);ans=a-b;}
-  else if(op==='×'){a=rnd(2,12);b=rnd(2,12);ans=a*b;}
-  else{ans=rnd(2,12);b=rnd(2,12);a=ans*b;}
-  return{expr:`${a} ${op} ${b}`,ans};
+  if(op==='+'){
+    const max=lv>=2?99:lv>=1?70:30;
+    a=rnd(1,max);b=rnd(1,max);ans=a+b;
+  }else if(op==='-'){
+    const max=lv>=2?99:lv>=1?70:30;
+    a=rnd(5,max);b=rnd(1,a);ans=a-b;
+  }else if(op==='×'){
+    const maxA=lv>=3?15:12,maxB=lv>=3?15:12;
+    a=rnd(2,maxA);b=rnd(2,maxB);ans=a*b;
+  }else{
+    const maxQ=lv>=3?15:12;
+    ans=rnd(2,maxQ);b=rnd(2,maxQ);a=ans*b;
+  }
+  return{expr:`${a} ${op} ${b}`,ans,lv};
 }
 
 function rnd(a,b){return a+Math.floor(Math.random()*(b-a+1));}
@@ -95,8 +118,15 @@ async function endGame(){
   document.getElementById('r-sub').textContent=`정답 ${correct}/${total} (${acc}%) | 최고: ${Math.max(score,best??0)}점`;
 }
 
+const LV_LABELS=['Lv.1 · ＋ −','Lv.2 · ＋ − ×','Lv.3 · ＋ − × ÷','Lv.4 · ALL ↑↑'];
+const LV_NEXT=[5,12,20,Infinity];
+
 function updateHUD(){
   document.getElementById('score').textContent=score;
   document.getElementById('combo').textContent=combo;
   document.getElementById('best').textContent=Math.max(score,best??0);
+  const lv=getDiffLevel();
+  const remaining=LV_NEXT[lv]-correct;
+  const bar=document.getElementById('level-bar');
+  if(bar)bar.textContent=LV_LABELS[lv]+(lv<3?`  (다음 단계까지 ${remaining}문제)`:'  🔥 최고 난이도!');
 }

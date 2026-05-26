@@ -1,6 +1,6 @@
 import { createSaveManager } from "../../shared/save.js";
 
-// ── Word lists ─────────────────────────────────────────────────────────────
+// ── Word list ──────────────────────────────────────────────────────────────
 const ANSWERS = [
   "about","above","abuse","actor","acute","admit","adopt","adult","after","again",
   "agent","agree","ahead","alarm","album","alert","alien","align","alike","alive",
@@ -79,20 +79,36 @@ const ANSWERS = [
   "youth","zebra","zesty","zippy","zonal"
 ];
 
-const VALID_WORDS = new Set(ANSWERS); // only answer words needed for validity check
-// Accept any 5-letter combo; just check it's 5 alpha chars
 function isValidGuess(w){ return /^[a-zA-Z]{5}$/.test(w); }
 
 // ── State ──────────────────────────────────────────────────────────────────
-let answer, guesses, currentRow, currentCol, gameOver, streak, best;
+let answer, guesses, currentRow, currentCol, gameOver;
+let streak = 0, best = 0;
+// Daily tracking
+let savedDate = null, savedGuesses = null, savedWon = false;
+
+function getTodayKey(){
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
 
 const saveManager = createSaveManager({
   gameId: 'game-wordle',
   loginStatusEl: document.getElementById('login-status'),
-  getSaveData(){ return { streak, best }; },
+  getSaveData(){
+    return {
+      streak, best,
+      lastDate: getTodayKey(),
+      lastGuesses: guesses ?? [],
+      lastWon: (guesses??[]).length > 0 && guesses[guesses.length-1].result.every(r=>r==='correct'),
+    };
+  },
   applySaveData(d){
     streak = d.streak ?? 0;
-    best = d.best ?? 0;
+    best   = d.best   ?? 0;
+    savedDate   = d.lastDate   ?? null;
+    savedGuesses= d.lastGuesses ?? null;
+    savedWon    = d.lastWon    ?? false;
     updateHUD();
   },
 });
@@ -105,16 +121,55 @@ document.getElementById('start-btn').addEventListener('click', () => {
 
 // ── Game lifecycle ─────────────────────────────────────────────────────────
 function newGame(){
-  // Pick deterministic daily word
+  const today = getTodayKey();
   const dayIdx = Math.floor(Date.now() / 86400000) % ANSWERS.length;
   answer = ANSWERS[dayIdx].toUpperCase();
+
   guesses = [];
   currentRow = 0;
   currentCol = 0;
   gameOver = false;
+
   buildBoard();
   buildKeyboard();
   showMessage('');
+  document.getElementById('keyboard').style.pointerEvents = '';
+  document.getElementById('keyboard').style.opacity = '';
+  updateHUD();
+
+  // 오늘 이미 플레이한 경우 → 결과 복원
+  if(savedDate === today && savedGuesses && savedGuesses.length > 0){
+    restoreToday(savedGuesses, savedWon);
+  }
+}
+
+// ── Restore today's game ───────────────────────────────────────────────────
+function restoreToday(saved, won){
+  gameOver = true;
+  guesses = [...saved];
+  currentRow = saved.length;
+
+  // Fill tiles instantly (no animation)
+  saved.forEach(({word, result}, row) => {
+    for(let c = 0; c < 5; c++){
+      const tile = getTile(row, c);
+      tile.textContent = word[c];
+      tile.classList.remove('filled','pop');
+      tile.classList.add(result[c]);
+    }
+    updateKeyboard(word, result);
+  });
+
+  // Lock keyboard
+  document.getElementById('keyboard').style.pointerEvents = 'none';
+  document.getElementById('keyboard').style.opacity = '0.6';
+
+  if(won){
+    const tries = saved.length;
+    showMessage(`🔒 오늘은 이미 완료! ${tries}번 만에 정답 (연속 ${streak}회)`);
+  } else {
+    showMessage(`🔒 오늘 이미 도전 완료. 정답: ${answer}`);
+  }
   updateHUD();
 }
 
@@ -122,10 +177,10 @@ function newGame(){
 function buildBoard(){
   const board = document.getElementById('board');
   board.innerHTML = '';
-  for(let r=0;r<6;r++){
+  for(let r = 0; r < 6; r++){
     const row = document.createElement('div');
     row.className = 'board-row';
-    for(let c=0;c<5;c++){
+    for(let c = 0; c < 5; c++){
       const tile = document.createElement('div');
       tile.className = 'tile';
       tile.id = `t-${r}-${c}`;
@@ -166,7 +221,7 @@ function submitGuess(){
     const won = result.every(r=>r==='correct');
     if(won){
       streak = (streak||0)+1;
-      if(streak > (best||0)){ best=streak; }
+      if(streak > (best||0)) best = streak;
       saveManager.save();
       showMessage(msgs[Math.min(currentRow,5)]);
       gameOver = true;
@@ -194,11 +249,9 @@ function evaluate(guess, ans){
   const res = Array(5).fill('absent');
   const ansCopy = ans.split('');
   const guessCopy = guess.split('');
-  // First pass: correct
   for(let i=0;i<5;i++){
     if(guessCopy[i]===ansCopy[i]){ res[i]='correct'; ansCopy[i]=null; guessCopy[i]=null; }
   }
-  // Second pass: present
   for(let i=0;i<5;i++){
     if(guessCopy[i]===null) continue;
     const idx=ansCopy.indexOf(guessCopy[i]);
@@ -258,8 +311,6 @@ function updateKeyboard(word, result){
     const letter=word[i];
     const btn=document.querySelector(`.key[data-key="${letter}"]`);
     if(!btn) continue;
-    const prev=btn.className;
-    // Priority: correct > present > absent
     if(result[i]==='correct') btn.classList.add('correct');
     else if(result[i]==='present' && !btn.classList.contains('correct')) btn.classList.add('present');
     else if(result[i]==='absent' && !btn.classList.contains('correct') && !btn.classList.contains('present')) btn.classList.add('absent');
@@ -282,10 +333,9 @@ document.addEventListener('keydown',e=>{
   }
 });
 
-// ── UI helpers ─────────────────────────────────────────────────────────────
+// ── UI ─────────────────────────────────────────────────────────────────────
 function showMessage(txt){
-  const el=document.getElementById('message');
-  el.textContent=txt;
+  document.getElementById('message').textContent=txt;
 }
 
 function updateHUD(){
@@ -295,11 +345,15 @@ function updateHUD(){
 }
 
 function showPlayAgain(won){
-  showMessage((won?'🎉 정답! ':'😢 실패! ')+`다시 도전하려면 탭하세요`);
   const kb=document.getElementById('keyboard');
   const btn=document.createElement('button');
-  btn.className='btn-start';btn.textContent='다시 하기';
+  btn.className='btn-start';btn.textContent='다시 하기 (새 게임)';
   btn.style.marginTop='8px';
-  btn.addEventListener('click',()=>{btn.remove();newGame();});
+  btn.addEventListener('click',()=>{
+    btn.remove();
+    // 오늘 게임은 끝났으므로 다음날 단어로 미리 보여줄 필요 없음 → 그냥 재시작
+    // 단, 오늘 날짜 저장은 이미 됐으므로 재시작하면 바로 복원 화면이 표시됨
+    newGame();
+  });
   kb.after(btn);
 }

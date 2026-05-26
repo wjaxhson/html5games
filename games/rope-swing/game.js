@@ -23,9 +23,11 @@ function startGame(){
   document.getElementById('game-screen').classList.add('active');
   score=0;camX=0;running=true;
   ball={x:80,y:H/2,vx:3,vy:0,r:12};
-  rope=null;
   poles=genPoles(0,8);
   stars=genStars(0,10);
+  // 첫 번째 기둥에 로프를 미리 연결해서 시작
+  const first=poles[0];
+  rope={pole:first,len:Math.hypot(first.x-ball.x,first.y-ball.y)};
   cancelAnimationFrame(rafId);lastT=0;
   rafId=requestAnimationFrame(loop);
   updateHUD();
@@ -134,10 +136,9 @@ function draw(){
   ctx.fillStyle='rgba(255,255,255,.3)';ctx.beginPath();ctx.arc(ball.x-4,ball.y-4,ball.r*0.4,0,Math.PI*2);ctx.fill();
   ctx.restore();
   // tap hint
-  if(!rope){
-    ctx.fillStyle='rgba(255,255,255,.3)';ctx.font='13px system-ui';ctx.textAlign='center';
-    ctx.fillText('탭 — 로프 걸기 / 다시 탭 — 놓기',W/2,H-20);
-  }
+  ctx.fillStyle='rgba(255,255,255,.25)';ctx.font='13px system-ui';ctx.textAlign='center';
+  if(rope){ctx.fillText('탭 — 로프 놓기',W/2,H-20);}
+  else{ctx.fillText('탭 — 로프 걸기',W/2,H-20);}
 }
 
 async function endGame(){
