@@ -16,7 +16,8 @@
 - [x] `visible: false` 게임 숨김 처리
 - [x] 공통 CSS 작성 (`shared/common.css`)
 - [x] 게임 공통 레이아웃 작성 (`shared/game-layout.css`)
-- [x] 공용 저장 모듈 작성 (`shared/save.js`)
+- [x] 공용 저장 모듈 작성 (`shared/save.js`, `createSaveManager()`)
+- [x] 전체 게임 통합 네비게이션 (back-link 통일)
 
 ### 게임 (1차)
 - [x] Simple Clicker
@@ -36,14 +37,14 @@
 - [x] Tetris — 테트리스 (SRS 회전, 고스트, 모바일 스와이프)
 - [x] Memory Card — 메모리 카드 (4x4/6x6 이모지 매칭)
 - [x] Typing Test — 타자 연습 (60초 WPM)
-- [x] Minesweeper — 지뢰찾기 (첫 클릭 안전, 롱프레스 깃발)
-- [x] Space Invaders — 스페이스 인베이더 (웨이브, 파티클)
-- [x] Simon Says — 사이먼 게임 (색상 시퀀스)
-- [x] Rhythm Tap — 리듬 탭 (수축 원 타이밍)
-- [x] Bubble Shooter — 슈팅버블 (헥스 그리드, BFS 매칭)
-- [x] Math Rush — 숫자 퀴즈 (60초 사칙연산)
-- [x] Rope Swing — 로프 스윙 (진자 물리)
-- [x] Wordle — 워들 (5글자 추측, 6번 시도)
+- [x] Minesweeper — 지뢰찾기 (첫 클릭 안전, 롱프레스 깃발, 동적 셀 크기)
+- [x] Space Invaders — 스페이스 인베이더 (웨이브, 파티클, 적 폭탄, 동시 이동+발사 수정)
+- [x] Simon Says — 사이먼 게임 (2×2/3×3/4×4 모드, 모드별 최고 기록)
+- [x] Rhythm Tap — 리듬 탭 (수축 원 타이밍, LATE 판정 추가)
+- [x] Bubble Shooter — 슈팅버블 (헥스 그리드, BFS 매칭, 스냅 버그 수정)
+- [x] Math Rush — 숫자 퀴즈 (60초 사칙연산, 맞춘 개수 기반 난이도 상승)
+- [x] Rope Swing — 로프 스윙 (진자 물리, 시작 시 로프 연결 상태)
+- [x] Wordle — 워들 (5글자 추측, 6번 시도, 데일리 잠금, 키보드 색상 우선순위)
 
 ---
 
@@ -53,7 +54,7 @@
 - [x] 기존 게임 3개 실제 배포 테스트
 - [x] 로그인 상태 저장/불러오기 테스트
 - [x] 비로그인 localStorage 저장 테스트
-- [ ] 모바일 화면 테스트
+- [ ] 모바일 화면 전수 테스트
 - [x] 썸네일 누락 시 기본 이미지 확인
 
 ### UI 개선

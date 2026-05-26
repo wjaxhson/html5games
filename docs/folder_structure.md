@@ -2,46 +2,79 @@
 
 ```txt
 root/
-├─ index.html
+├─ index.html          ← 런처 페이지 (게임 목록 + 로그인)
 ├─ style.css
 ├─ main.js
 │
 ├─ games/
 │   ├─ simple-clicker/
-│   │   ├─ index.html
-│   │   ├─ game.js
-│   │   ├─ style.css
-│   │   ├─ meta.json
-│   │   └─ thumbnail.png
-│   │
 │   ├─ upgrade-clicker/
-│   │   ├─ ...
-│   │
-│   ├─ ctystal-miner/
-│   │   ├─ ...
-│   ├─ ...
+│   ├─ crystal-miner/
+│   ├─ trace-the-line/
+│   ├─ more-dots/
+│   ├─ stroop-test/
+│   ├─ path-memory/
+│   ├─ expanding-map/
+│   ├─ 2048/
+│   ├─ snake/
+│   ├─ whack-a-mole/
+│   ├─ breakout/
+│   ├─ tetris/
+│   ├─ memory-card/
+│   ├─ typing-test/
+│   ├─ minesweeper/
+│   ├─ space-invaders/
+│   ├─ simon-says/
+│   ├─ rhythm-tap/
+│   ├─ bubble-shooter/
+│   ├─ math-rush/
+│   ├─ rope-swing/
+│   └─ wordle/
 │
 ├─ shared/
-│   ├─ firebase.js
-│   ├─ save.js
-│   ├─ game-list.js
-│   ├─ ...
+│   ├─ firebase.js          ← Firebase 초기화
+│   ├─ save.js              ← createSaveManager() 저장 공통 모듈
+│   ├─ game-list.js         ← gameFolders 배열 (게임 목록)
+│   ├─ common.css           ← 전체 공통 스타일
+│   ├─ game-layout.css      ← 게임 레이아웃 공통
+│   └─ default-thumbnail.png
 │
 └─ docs/
+    ├─ ai_context.md
+    ├─ coding-rules.md
+    ├─ coding_rules.md
+    ├─ deployment.md
+    ├─ firebase_structure.md
+    ├─ folder_structure.md
+    ├─ game_list_system.md
+    ├─ game_template.md
+    ├─ project_overview.md
+    └─ todo.md
+```
+
+---
+
+# 각 게임 폴더 구조
+
+```txt
+games/game-id/
+├─ index.html      ← 게임 진입 (ES Module)
+├─ game.js         ← 게임 로직 (반드시 game.js)
+├─ style.css       ← 게임 전용 스타일
+├─ meta.json       ← 제목/설명/visible
+└─ thumbnail.png   ← 선택 (없으면 default-thumbnail.png)
 ```
 
 ---
 
 # 플랫폼 구조
 
-현재 프로젝트는 다음 흐름을 기준으로 구성한다.
-
 ```txt
 접속
-→ 로그인
-→ 게임 선택
-→ 게임 실행
-→ 게임 내부 저장/불러오기 처리
+→ 로그인 (Google OAuth)
+→ 게임 선택 (런처 페이지)
+→ 게임 실행 (games/game-id/index.html)
+→ 게임 내부 저장/불러오기 (createSaveManager)
 ```
 
 루트 페이지는 실제 게임 화면이 아니라  
@@ -53,53 +86,33 @@ root/
 
 각 게임은 반드시 독립 실행 가능해야 한다.
 
-기본 구조:
-
 ```txt
 games/
   game-id/
-    index.html
-    game.js
+    index.html    ← back-link 포함
+    game.js       ← createSaveManager import
+    meta.json     ← visible: true/false
 ```
 
-권장 구조:
+`meta.json` 예시:
 
-```txt
-games/
-  game-id/
-    index.html
-    game.js
-    style.css
-    meta.json
-    thumbnail.png
-```
-
-+ meta.json 설명
-  
-`thumbnail.png` 파일명은 고정한다.
-`meta.json`에는 썸네일 경로를 적지 않는다.
-
-예시:
-
+```json
 {
   "title": "Crystal Miner",
   "description": "수정을 채굴하고 자동 채굴기를 구매하는 방치형 클리커 게임",
   "visible": true
 }
+```
 
-`visible: false`인 게임은 메인 목록에 표시하지 않는다.
-단, 직접 URL로 접근하는 것은 가능하다.
-
-메인 페이지의 게임 목록은 `shared/game-list.js`에 등록된 게임 폴더 목록을 기준으로 각 게임의 `meta.json`을 불러와 생성한다.
-
+- `visible: false`인 게임은 메인 목록에 표시하지 않는다.
+- 직접 URL로 접근하는 것은 가능하다.
+- 메인 페이지 게임 목록은 `shared/game-list.js`의 `gameFolders` 배열을 기준으로 각 게임의 `meta.json`을 불러와 생성한다.
 
 ---
 
 # 역할 분리
 
 ## 루트 페이지
-
-루트 페이지의 역할:
 
 - 로그인
 - 로그인 상태 표시
@@ -112,65 +125,35 @@ games/
 
 ## 게임 내부
 
-각 게임 내부의 역할:
-
 - 게임 로직
-- UI
-- 저장/불러오기
-- 자동 저장
-- 입력 처리
-- Canvas 처리
+- UI 및 Canvas 처리
+- 저장/불러오기 (`createSaveManager`)
+- 입력 처리 (키보드, 터치, Canvas 분할 클릭)
 - 게임 상태 관리
 
 ---
 
 # 저장 시스템 구조
 
-저장 시스템은 메인 페이지가 아니라  
-각 게임 내부에서 처리한다.
+저장 시스템은 각 게임 내부에서 처리한다.
+
+```js
+import { createSaveManager } from "../../shared/save.js";
+
+const saveManager = createSaveManager({
+  gameId: 'game-example',
+  loginStatusEl: document.getElementById('login-status'),
+  getSaveData() { return { score, best }; },
+  applySaveData(d) { best = d.best ?? 0; updateHUD(); },
+});
+
+saveManager.save();  // 저장
+```
 
 ## 저장 정책
 
-로그인 상태:
-- Firebase Firestore 사용
-
-비로그인 상태:
-- localStorage 사용
-
-## 기본 동작
-
-- 게임 진입 시 자동 불러오기
-- 30초마다 자동 저장
-- 수동 저장 버튼 제공
-- 저장 데이터가 없으면 새 게임 시작
-
----
-
-# Firestore 구조
-
-Firestore 저장 구조:
-
-```txt
-users/{uid}/games/{gameId}
-```
-
-예시:
-
-```txt
-users/abcd1234/games/simple-clicker
-```
-
----
-
-# 저장 데이터 예시
-
-```json
-{
-  "gameId": "simple-clicker",
-  "score": 15,
-  "updatedAt": 1710000000000
-}
-```
+- 로그인 상태: Firebase Firestore `users/{uid}/games/{gameId}` 저장
+- 비로그인 상태: localStorage `html5games:{gameId}:save` 저장
 
 ---
 
@@ -178,26 +161,16 @@ users/abcd1234/games/simple-clicker
 
 `shared/` 는 여러 게임에서 공통으로 사용하는 기능을 관리한다.
 
-예시:
-
-- Firebase 초기화
-- 인증 처리
-- 저장 공통 로직
-- 공통 UI
-- 게임 목록 데이터
-- 공통 유틸 함수
+- `firebase.js`: Firebase 초기화, Google 로그인
+- `save.js`: `createSaveManager()` — 저장/불러오기 공통 로직
+- `game-list.js`: `gameFolders` 배열 — 게임 목록 관리
+- `common.css`: 전체 공통 스타일 (back-link, screen, btn-start 등)
+- `game-layout.css`: 게임 레이아웃 공통
+- `default-thumbnail.png`: 썸네일 없는 게임의 기본 이미지
 
 게임 자체 로직은 `games/` 내부에서 관리한다.
 
-자세한 게임 목록 관리 방식은
-`docs/game_list_system.md` 를 참고한다.
-
-## shared 공통 UI
-
-- `shared/save-ui.js`: 게임 저장 UI 공통 모듈
-- `shared/save-ui.css`: 저장 UI 전용 스타일
-- 각 게임은 자체 저장 로직만 만들고, 저장 버튼/자동저장 카운트다운/저장 상태 표시는 `createSaveUI()`를 사용한다.
-- 게임별 `index.html`에서는 `save-ui.css`를 게임별 CSS보다 뒤에 로드한다.
+자세한 게임 목록 관리 방식은 `docs/game_list_system.md` 참고.
 
 ---
 
