@@ -25,11 +25,21 @@ document.getElementById('cb-right').addEventListener('pointerup',()=>keys['Arrow
 document.getElementById('cb-fire').addEventListener('click',shoot);
 document.addEventListener('keydown',e=>{keys[e.key]=true;if(e.key===' '){e.preventDefault();shoot();}});
 document.addEventListener('keyup',e=>{keys[e.key]=false;});
+// 캔버스 클릭: 좌/우 1/3 이동, 중앙 발사
+// 이동과 발사를 동시에 할 수 있도록 각 키를 독립적으로 처리
 document.getElementById('canvas-wrap').addEventListener('click',e=>{
   const rect=canvas.getBoundingClientRect();
   const px=(e.clientX-rect.left)/(rect.width/W);
-  if(px<W/3)keys['ArrowLeft']=true; else if(px>W*2/3)keys['ArrowRight']=true; else shoot();
-  setTimeout(()=>{keys['ArrowLeft']=false;keys['ArrowRight']=false;},120);
+  if(px<W/3){
+    // 좌측 탭: 잠깐 왼쪽 이동 (키보드 이동 중이면 무시)
+    if(!keys['ArrowLeft']){keys['ArrowLeft']=true;setTimeout(()=>keys['ArrowLeft']=false,120);}
+  } else if(px>W*2/3){
+    // 우측 탭: 잠깐 오른쪽 이동
+    if(!keys['ArrowRight']){keys['ArrowRight']=true;setTimeout(()=>keys['ArrowRight']=false,120);}
+  } else {
+    // 중앙 탭: 발사만 (이동 키 건드리지 않음)
+    shoot();
+  }
 });
 
 function initGame(){

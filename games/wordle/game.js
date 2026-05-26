@@ -306,14 +306,23 @@ function buildKeyboard(){
   });
 }
 
+const STATE_PRIO = {correct:3, present:2, absent:1};
+
 function updateKeyboard(word, result){
   for(let i=0;i<5;i++){
     const letter=word[i];
     const btn=document.querySelector(`.key[data-key="${letter}"]`);
     if(!btn) continue;
-    if(result[i]==='correct') btn.classList.add('correct');
-    else if(result[i]==='present' && !btn.classList.contains('correct')) btn.classList.add('present');
-    else if(result[i]==='absent' && !btn.classList.contains('correct') && !btn.classList.contains('present')) btn.classList.add('absent');
+    const newState=result[i];
+    // 현재 키 상태 파악
+    const curState=btn.classList.contains('correct')?'correct':
+                   btn.classList.contains('present')?'present':
+                   btn.classList.contains('absent')?'absent':null;
+    // 더 높은 우선순위일 때만 업데이트 (correct > present > absent)
+    if(!curState || STATE_PRIO[newState] > STATE_PRIO[curState]){
+      if(curState) btn.classList.remove(curState);
+      btn.classList.add(newState);
+    }
   }
 }
 

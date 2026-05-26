@@ -48,15 +48,27 @@ function loop(ts){
   rafId=requestAnimationFrame(loop);
 }
 
+const LATE_WINDOW=500; // ms: PERFECT 통과 후 이 시간 동안 늦은 탭 허용
+
 function update(dt){
   notes.forEach(n=>{
     if(!n.alive)return;
     n.elapsed+=dt;
-    const t=Math.min(n.elapsed/n.dur,1);
-    n.r=n.startR-(n.startR-n.endR)*t;
-    if(t>=1&&!n.hit){miss(n);}
+    if(n.elapsed<n.dur){
+      // 접근 구간: 원이 TARGET_R을 향해 수축
+      const t=n.elapsed/n.dur;
+      n.r=n.startR-(n.startR-n.endR)*t;
+      n.late=false;
+    } else if(n.elapsed<n.dur+LATE_WINDOW){
+      // LATE 구간: TARGET_R에서 0으로 추가 수축
+      const lt=(n.elapsed-n.dur)/LATE_WINDOW;
+      n.r=n.endR*(1-lt);
+      n.late=true;
+    } else {
+      miss(n);
+    }
   });
-  notes=notes.filter(n=>n.alive||n.elapsed<n.dur+300);
+  notes=notes.filter(n=>n.alive||(n.elapsed<n.dur+LATE_WINDOW+200));
 }
 
 function onTap(){
@@ -64,22 +76,34 @@ function onTap(){
   let tapped=false;
   for(const n of notes){
     if(!n.alive||n.hit)continue;
-    const diff=Math.abs(n.r-TARGET_R);
-    if(diff<=30){  // 넓은 판정 창
+    if(!n.late){
+      // 접근 구간 판정
+      const diff=Math.abs(n.r-TARGET_R);
+      if(diff<=30){
+        n.hit=true;n.alive=false;
+        const pts=diff<=6?300:diff<=15?200:100;
+        const label=diff<=6?'🎯 PERFECT!':diff<=15?'✅ GREAT!':'👍 GOOD';
+        score+=pts*(1+Math.floor(combo/5));combo++;
+        level=1+Math.floor(score/1000);
+        showFeedback(label,diff<=6?'#fbbf24':'#34d399');
+        updateHUD();tapped=true;
+        if(score>(best??0)){best=score;saveManager.save();}
+        break;
+      }
+    } else {
+      // LATE 구간: 누르기만 하면 점수 (빨리 누를수록 높음)
       n.hit=true;n.alive=false;
-      const pts=diff<=6?300:diff<=15?200:100;
-      const label=diff<=6?'🎯 PERFECT!':diff<=15?'✅ GREAT!':'👍 GOOD';
-      score+=pts*(1+Math.floor(combo/5));combo++;
-      level=1+Math.floor(score/1000);
-      showFeedback(label,diff<=6?'#fbbf24':'#34d399');
+      const lateMs=n.elapsed-n.dur;
+      const pts=lateMs<150?80:lateMs<300?50:20;
+      score+=pts;combo=0; // LATE는 콤보 초기화
+      showFeedback(`⏰ LATE  +${pts}`,'#f59e0b');
       updateHUD();tapped=true;
       if(score>(best??0)){best=score;saveManager.save();}
       break;
     }
   }
-  // 빈 탭 미스: 노트가 이미 판정 창을 지나쳐 사라진 경우에만 감점
   if(!tapped){
-    const nearMissed=notes.some(n=>n.alive&&!n.hit&&n.r<TARGET_R-32);
+    const nearMissed=notes.some(n=>n.alive&&!n.hit&&!n.late&&n.r<TARGET_R-32);
     if(nearMissed){showFeedback('❌ MISS','#f87171');loseLife();}
   }
 }
@@ -104,14 +128,24 @@ function draw(){
 
   notes.forEach(n=>{
     if(!n.alive)return;
-    // target ring
-    ctx.strokeStyle=n.color+'88';ctx.lineWidth=3;
-    ctx.beginPath();ctx.arc(n.x,n.y,TARGET_R,0,Math.PI*2);ctx.stroke();
-    // approach circle
-    const alpha=Math.min(1,(n.startR-n.r)/(n.startR-TARGET_R)*2);
-    ctx.strokeStyle=n.color;ctx.lineWidth=4;ctx.globalAlpha=alpha;
-    ctx.beginPath();ctx.arc(n.x,n.y,n.r,0,Math.PI*2);ctx.stroke();
-    ctx.globalAlpha=1;
+    if(!n.late){
+      // 접근 구간: 목표 링 + 수축 원
+      ctx.strokeStyle=n.color+'88';ctx.lineWidth=3;
+      ctx.beginPath();ctx.arc(n.x,n.y,TARGET_R,0,Math.PI*2);ctx.stroke();
+      const alpha=Math.min(1,(n.startR-n.r)/(n.startR-TARGET_R)*2);
+      ctx.strokeStyle=n.color;ctx.lineWidth=4;ctx.globalAlpha=alpha;
+      ctx.beginPath();ctx.arc(n.x,n.y,n.r,0,Math.PI*2);ctx.stroke();
+      ctx.globalAlpha=1;
+    } else {
+      // LATE 구간: 노란색으로 깜빡이며 사라짐
+      const fade=1-(n.elapsed-n.dur)/LATE_WINDOW;
+      ctx.globalAlpha=fade*0.9;
+      ctx.strokeStyle='#f59e0b';ctx.lineWidth=5;
+      ctx.beginPath();ctx.arc(n.x,n.y,TARGET_R,0,Math.PI*2);ctx.stroke();
+      ctx.strokeStyle='#f59e0b88';ctx.lineWidth=3;
+      ctx.beginPath();ctx.arc(n.x,n.y,Math.max(n.r,2),0,Math.PI*2);ctx.stroke();
+      ctx.globalAlpha=1;
+    }
     // center dot
     ctx.fillStyle=n.color;ctx.beginPath();ctx.arc(n.x,n.y,8,0,Math.PI*2);ctx.fill();
   });
