@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>두더지 잡기</title>
+  <link rel="stylesheet" href="../../shared/common.css">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <a href="../../index.html" class="back-link">← 게임 목록</a>
+
+  <div id="app">
+    <!-- START -->
+    <div id="start-screen" class="screen active">
+      <div class="brand">Reaction Game</div>
+      <div class="title-block">
+        <div class="title-main">🐹 두더지 잡기</div>
+        <div class="title-sub">올라오는 두더지를 빠르게 잡아라!</div>
+      </div>
+      <div class="mole-preview">🐹</div>
+      <div class="rule-card">
+        <div class="rule-item">
+          <div class="rule-dot">1</div>
+          <span>구멍에서 올라오는 두더지를 탭하세요.</span>
+        </div>
+        <div class="rule-item">
+          <div class="rule-dot">2</div>
+          <span>🐹 일반 두더지 +10점 / 💀 폭탄 두더지 -5점!</span>
+        </div>
+        <div class="rule-item">
+          <div class="rule-dot">3</div>
+          <span>30초 안에 최고 점수를 달성하세요.</span>
+        </div>
+      </div>
+      <div class="difficulty-row">
+        <span class="diff-label">난이도</span>
+        <button class="diff-btn active" data-diff="easy">쉬움</button>
+        <button class="diff-btn" data-diff="normal">보통</button>
+        <button class="diff-btn" data-diff="hard">어려움</button>
+      </div>
+      <button id="start-btn" class="btn-start">시작하기 →</button>
+    </div>
+
+    <!-- GAME -->
+    <div id="game-screen" class="screen">
+      <div id="login-status" class="login-status"></div>
+      <div class="hud">
+        <div class="hud-item">
+          <span class="hud-label">점수</span>
+          <span class="hud-val" id="score">0</span>
+        </div>
+        <div class="hud-item">
+          <span class="hud-label">최고</span>
+          <span class="hud-val" id="best">0</span>
+        </div>
+        <div class="hud-item">
+          <span class="hud-label">남은 시간</span>
+          <span class="hud-val" id="timer">30</span>
+        </div>
+      </div>
+      <div id="grid"></div>
+      <div id="combo-display"></div>
+    </div>
+
+    <!-- RESULT -->
+    <div id="result-screen" class="screen">
+      <div class="result-card">
+        <div class="result-emoji" id="result-emoji">🎉</div>
+        <div class="result-title" id="result-title">완료!</div>
+        <div class="result-score" id="result-score"></div>
+        <div class="result-sub" id="result-sub"></div>
+      </div>
+      <button id="retry-btn" class="btn-start">다시하기 →</button>
+      <button id="home-btn" class="btn-secondary">난이도 선택</button>
+    </div>
+  </div>
+
+  <script type="module" src="./game.js"></script>
+</body>
+</html>

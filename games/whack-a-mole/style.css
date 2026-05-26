@@ -1,0 +1,157 @@
+/* ==============================
+   Whack-a-Mole – Style
+============================== */
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #0f172a;
+  color: #f8fafc;
+  font-family: system-ui, -apple-system, sans-serif;
+  min-height: 100dvh;
+  display: flex; align-items: center; justify-content: center;
+}
+
+#app { width: 100%; max-width: 480px; padding: 16px; }
+
+.screen { display: none; }
+.screen.active { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+
+/* ── Start ── */
+.brand { font-size: 13px; letter-spacing: .12em; color: #64748b; text-transform: uppercase; }
+.title-block { text-align: center; }
+.title-main { font-size: clamp(32px, 10vw, 52px); font-weight: 900; color: #a78bfa; line-height: 1.1; }
+.title-sub   { font-size: 15px; color: #94a3b8; margin-top: 8px; }
+
+.mole-preview { font-size: 64px; filter: drop-shadow(0 0 16px #a78bfa88); }
+
+.rule-card {
+  width: 100%; background: #1e293b; border: 1px solid #334155;
+  border-radius: 16px; padding: 16px 20px;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.rule-item { display: flex; align-items: flex-start; gap: 12px; font-size: 14px; color: #cbd5e1; line-height: 1.5; }
+.rule-dot {
+  min-width: 24px; height: 24px; border-radius: 50%;
+  background: #a78bfa; color: #0f172a;
+  font-weight: 700; font-size: 13px;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.difficulty-row {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center;
+}
+.diff-label { font-size: 14px; color: #94a3b8; }
+.diff-btn {
+  padding: 8px 18px; border: 2px solid #334155; border-radius: 10px;
+  background: transparent; color: #94a3b8; font-size: 14px; font-weight: 700;
+  cursor: pointer; transition: all .15s;
+}
+.diff-btn.active, .diff-btn:hover { border-color: #a78bfa; color: #a78bfa; background: #1e293b; }
+
+.btn-start {
+  width: 100%; padding: 16px; border: none; border-radius: 14px;
+  background: #a78bfa; color: #0f172a;
+  font-size: 18px; font-weight: 800; cursor: pointer; transition: opacity .15s;
+}
+.btn-start:hover { opacity: .85; }
+
+.btn-secondary {
+  width: 100%; padding: 14px; border: 2px solid #334155; border-radius: 14px;
+  background: transparent; color: #94a3b8;
+  font-size: 16px; font-weight: 700; cursor: pointer; transition: all .15s;
+}
+.btn-secondary:hover { border-color: #a78bfa; color: #a78bfa; }
+
+/* ── Login Status ── */
+.login-status {
+  font-size: 12px;
+  color: #64748b;
+  text-align: center;
+  min-height: 16px;
+  width: 100%;
+}
+
+/* ── HUD ── */
+.hud {
+  display: flex; justify-content: center; gap: 20px; width: 100%;
+  margin-bottom: 4px;
+}
+.hud-item { display: flex; flex-direction: column; align-items: center; }
+.hud-label { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: .06em; }
+.hud-val { font-size: 24px; font-weight: 800; color: #a78bfa; }
+
+/* ── Grid ── */
+#grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  width: 100%;
+}
+
+.hole {
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #1a1a2e;
+  border: 3px solid #2a2a4a;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  display: flex; align-items: flex-end; justify-content: center;
+  transition: border-color .1s;
+}
+.hole:active { border-color: #a78bfa; }
+
+.hole-dirt {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 40%;
+  background: #3d2b1a;
+  border-radius: 0 0 50% 50%;
+  z-index: 2;
+}
+
+.mole {
+  font-size: clamp(32px, 10vw, 56px);
+  position: absolute;
+  bottom: -100%;
+  z-index: 1;
+  transition: bottom .15s cubic-bezier(.34,1.56,.64,1);
+  user-select: none;
+  pointer-events: none;
+  line-height: 1;
+}
+.hole.up .mole { bottom: 30%; }
+.hole.whacked .mole { bottom: -100%; transition: bottom .1s; }
+
+.hit-flash {
+  position: absolute; inset: 0; border-radius: 50%;
+  background: #fff2; animation: flash .2s ease forwards;
+  pointer-events: none; z-index: 3;
+}
+@keyframes flash { to { opacity: 0; } }
+
+/* ── Combo ── */
+#combo-display {
+  height: 32px; display: flex; align-items: center; justify-content: center;
+  font-size: 20px; font-weight: 800; color: #fbbf24;
+  transition: opacity .3s;
+}
+.combo-pop { animation: combo-pop .35s ease; }
+@keyframes combo-pop {
+  0%   { transform: scale(1.4); }
+  100% { transform: scale(1); }
+}
+
+/* ── Result ── */
+.result-card {
+  width: 100%; background: #1e293b; border: 1px solid #334155;
+  border-radius: 20px; padding: 32px 24px; text-align: center;
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+}
+.result-emoji { font-size: 56px; }
+.result-title { font-size: 28px; font-weight: 900; }
+.result-score { font-size: 48px; font-weight: 900; color: #a78bfa; }
+.result-sub   { font-size: 15px; color: #94a3b8; }

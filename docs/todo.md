@@ -22,6 +22,15 @@
 - [x] Simple Clicker
 - [x] Upgrade Clicker
 - [x] Crystal Miner
+- [x] Trace The Line
+- [x] More Dots
+- [x] Stroop Test
+- [x] Path Memory
+- [x] Expanding Map
+- [x] 2048 (Firebase 저장 연동)
+- [x] Snake — 스네이크 (Firebase 저장 연동)
+- [x] Whack-a-Mole — 두더지 잡기 (난이도별 Firebase 저장 연동)
+- [x] Breakout — 벽돌깨기 (Firebase 저장 연동)
 
 ---
 
@@ -46,4 +55,10 @@
 - [ ] 게임별 통계 시스템
 - [ ] 랭킹
 - [ ] 업적
+
+### 게임 추가 후보
+- [ ] Simon Says (색상 패턴 기억)
+- [ ] Typing Speed Test (타이핑 속도)
+- [ ] Minesweeper (지뢰찾기)
+- [ ] Rhythm Tap (리듬 게임)
 

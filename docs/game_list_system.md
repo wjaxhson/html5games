@@ -17,7 +17,11 @@ export const gameFolders = [
   "more-dots",
   "stroop-test",
   "path-memory",
-  "expanding-map"
+  "expanding-map",
+  "2048",
+  "snake",
+  "whack-a-mole",
+  "breakout"
 ];
 ```
 
@@ -87,14 +91,7 @@ games/new-game/
 
 ```js
 export const gameFolders = [
-  "simple-clicker",
-  "upgrade-clicker",
-  "crystal-miner",
-  "trace-the-line",
-  "more-dots",
-  "stroop-test",
-  "path-memory",
-  "expanding-map",
+  // 기존 게임들...
   "new-game"
 ];
 ```
@@ -118,4 +115,8 @@ games/more-dots/
 games/stroop-test/
 games/path-memory/
 games/expanding-map/
+games/2048/
+games/snake/
+games/whack-a-mole/
+games/breakout/
 ```

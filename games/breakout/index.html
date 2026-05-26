@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>벽돌깨기</title>
+  <link rel="stylesheet" href="../../shared/common.css">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <a href="../../index.html" class="back-link">← 게임 목록</a>
+
+  <div id="app">
+    <!-- START -->
+    <div id="start-screen" class="screen active">
+      <div class="brand">Arcade Game</div>
+      <div class="title-block">
+        <div class="title-main">🧱 벽돌깨기</div>
+        <div class="title-sub">공을 튕겨 모든 벽돌을 부수세요!</div>
+      </div>
+      <div class="rule-card">
+        <div class="rule-item">
+          <div class="rule-dot">1</div>
+          <span>마우스 또는 터치로 패들을 움직이세요.</span>
+        </div>
+        <div class="rule-item">
+          <div class="rule-dot">2</div>
+          <span>공이 떨어지면 목숨(❤️)이 줄어듭니다.</span>
+        </div>
+        <div class="rule-item">
+          <div class="rule-dot">3</div>
+          <span>💛 파워업 아이템을 잡으면 패들이 넓어집니다!</span>
+        </div>
+        <div class="rule-item">
+          <div class="rule-dot">4</div>
+          <span>모든 벽돌을 부수면 다음 스테이지로 진행!</span>
+        </div>
+      </div>
+      <button id="start-btn" class="btn-start">시작하기 →</button>
+    </div>
+
+    <!-- GAME -->
+    <div id="game-screen" class="screen">
+      <div id="login-status" class="login-status"></div>
+      <div class="hud">
+        <div class="hud-item">
+          <span class="hud-label">점수</span>
+          <span class="hud-val" id="score">0</span>
+        </div>
+        <div class="hud-item">
+          <span class="hud-label">최고</span>
+          <span class="hud-val" id="best">0</span>
+        </div>
+        <div class="hud-item">
+          <span class="hud-label">스테이지</span>
+          <span class="hud-val" id="stage">1</span>
+        </div>
+        <div class="hud-item">
+          <span class="hud-label">목숨</span>
+          <span class="hud-val" id="lives">❤️❤️❤️</span>
+        </div>
+      </div>
+      <div class="canvas-wrap" id="canvas-wrap">
+        <canvas id="canvas"></canvas>
+        <div id="overlay" class="hidden">
+          <div id="overlay-emoji"></div>
+          <div id="overlay-title"></div>
+          <div id="overlay-sub"></div>
+          <button id="overlay-btn" class="btn-start">계속하기 →</button>
+        </div>
+      </div>
+      <div class="touch-hint" id="touch-hint">← 좌우로 드래그 →</div>
+    </div>
+  </div>
+
+  <script type="module" src="./game.js"></script>
+</body>
+</html>

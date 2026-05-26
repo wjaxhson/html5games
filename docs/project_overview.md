@@ -50,11 +50,20 @@ games/
 
 ## 현재 구현된 게임
 
+### 클리커 / 방치형
 - Simple Clicker
 - Upgrade Clicker
 - Crystal Miner
+- Expanding Map
+
+### 반응속도 / 아케이드
 - Trace The Line
 - More Dots
+- Whack-a-Mole (두더지 잡기) — 난이도 3단계, 폭탄 두더지, 콤보 시스템
+- Snake (스네이크) — 모바일 D패드 지원, 속도 점진 상승
+- Breakout (벽돌깨기) — 멀티 스테이지, 파워업 아이템
+
+### 인지 / 퍼즐
 - Stroop Test
 - Path Memory
-- Expanding Map
+- 2048 — 터치 스와이프 지원, 타일 합치기 퍼즐

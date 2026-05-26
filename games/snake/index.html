@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>스네이크</title>
+  <link rel="stylesheet" href="../../shared/common.css">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <a href="../../index.html" class="back-link">← 게임 목록</a>
+
+  <div id="app">
+    <!-- START -->
+    <div id="start-screen" class="screen active">
+      <div class="brand">Arcade Game</div>
+      <div class="title-block">
+        <div class="title-main">🐍 스네이크</div>
+        <div class="title-sub">먹이를 먹으며 최대한 길게 자라보세요!</div>
+      </div>
+      <div class="rule-card">
+        <div class="rule-item">
+          <div class="rule-dot">1</div>
+          <span>화살표 키 또는 스와이프로 뱀을 움직이세요.</span>
+        </div>
+        <div class="rule-item">
+          <div class="rule-dot">2</div>
+          <span>🍎 먹이를 먹으면 점수와 길이가 늘어납니다.</span>
+        </div>
+        <div class="rule-item">
+          <div class="rule-dot">3</div>
+          <span>벽이나 자기 몸에 부딪히면 게임 오버!</span>
+        </div>
+      </div>
+      <button id="start-btn" class="btn-start">시작하기 →</button>
+    </div>
+
+    <!-- GAME -->
+    <div id="game-screen" class="screen">
+      <div class="hud">
+        <div class="hud-item">
+          <span class="hud-label">점수</span>
+          <span class="hud-val" id="score">0</span>
+        </div>
+        <div class="hud-item">
+          <span class="hud-label">최고</span>
+          <span class="hud-val" id="best">0</span>
+        </div>
+        <div class="hud-item">
+          <span class="hud-label">길이</span>
+          <span class="hud-val" id="length">1</span>
+        </div>
+      </div>
+      <div id="login-status" class="login-status"></div>
+      <div class="canvas-wrap">
+        <canvas id="canvas"></canvas>
+        <div id="overlay" class="hidden">
+          <div id="overlay-title"></div>
+          <div id="overlay-score"></div>
+          <button id="retry-btn" class="btn-start">다시하기 →</button>
+        </div>
+      </div>
+      <div class="dpad">
+        <button class="dpad-btn" id="btn-up">▲</button>
+        <div class="dpad-row">
+          <button class="dpad-btn" id="btn-left">◀</button>
+          <button class="dpad-btn dpad-center" id="btn-pause">⏸</button>
+          <button class="dpad-btn" id="btn-right">▶</button>
+        </div>
+        <button class="dpad-btn" id="btn-down">▼</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./game.js"></script>
+</body>
+</html>

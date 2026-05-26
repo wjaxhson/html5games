@@ -1,0 +1,96 @@
+/* ==============================
+   Breakout – Style
+============================== */
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #0f172a;
+  color: #f8fafc;
+  font-family: system-ui, -apple-system, sans-serif;
+  min-height: 100dvh;
+  display: flex; align-items: center; justify-content: center;
+}
+
+#app { width: 100%; max-width: 480px; padding: 16px; }
+
+.screen { display: none; }
+.screen.active { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+
+/* ── Start ── */
+.brand { font-size: 13px; letter-spacing: .12em; color: #64748b; text-transform: uppercase; }
+.title-block { text-align: center; }
+.title-main { font-size: clamp(32px, 10vw, 52px); font-weight: 900; color: #38bdf8; line-height: 1.1; }
+.title-sub   { font-size: 15px; color: #94a3b8; margin-top: 8px; }
+
+.rule-card {
+  width: 100%; background: #1e293b; border: 1px solid #334155;
+  border-radius: 16px; padding: 16px 20px;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.rule-item { display: flex; align-items: flex-start; gap: 12px; font-size: 14px; color: #cbd5e1; line-height: 1.5; }
+.rule-dot {
+  min-width: 24px; height: 24px; border-radius: 50%;
+  background: #38bdf8; color: #0f172a;
+  font-weight: 700; font-size: 13px;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.btn-start {
+  width: 100%; padding: 16px; border: none; border-radius: 14px;
+  background: #38bdf8; color: #0f172a;
+  font-size: 18px; font-weight: 800; cursor: pointer; transition: opacity .15s;
+}
+.btn-start:hover { opacity: .85; }
+
+/* ── Login Status ── */
+.login-status {
+  font-size: 12px;
+  color: #64748b;
+  text-align: center;
+  min-height: 16px;
+  width: 100%;
+}
+
+/* ── HUD ── */
+.hud {
+  display: flex; justify-content: center; gap: 16px; width: 100%; margin-bottom: 8px;
+}
+.hud-item { display: flex; flex-direction: column; align-items: center; }
+.hud-label { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: .06em; }
+.hud-val { font-size: 22px; font-weight: 800; color: #38bdf8; }
+
+/* ── Canvas ── */
+.canvas-wrap {
+  position: relative; width: 100%;
+  border-radius: 14px; overflow: hidden;
+  border: 2px solid #38bdf833;
+  background: #090e1a;
+  cursor: none;
+}
+#canvas { display: block; width: 100%; height: auto; touch-action: none; }
+
+/* ── Overlay ── */
+#overlay {
+  position: absolute; inset: 0;
+  background: rgba(9,14,26,.9);
+  backdrop-filter: blur(6px);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 14px;
+  text-align: center; padding: 24px;
+}
+#overlay.hidden { display: none; }
+#overlay-emoji { font-size: 52px; }
+#overlay-title { font-size: 30px; font-weight: 900; }
+#overlay-sub   { font-size: 16px; color: #94a3b8; }
+#overlay .btn-start { width: auto; padding: 14px 32px; margin-top: 4px; }
+
+/* ── Touch hint ── */
+.touch-hint {
+  font-size: 13px; color: #334155; text-align: center;
+  margin-top: 6px; letter-spacing: .04em;
+}
+
+@media (min-width: 480px) {
+  .touch-hint { display: none; }
+}

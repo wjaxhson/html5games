@@ -6,7 +6,11 @@ export const gameFolders = [
   "more-dots",
   "stroop-test",
   "path-memory",
-  "expanding-map"
+  "expanding-map",
+  "2048",
+  "snake",
+  "whack-a-mole",
+  "breakout"
 ];
 
 export async function loadGames() {

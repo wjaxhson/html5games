@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(New-Item -ItemType Directory -Force \"c:\\\\Users\\\\thsal\\\\Desktop\\\\work\\\\html5games\\\\games\\\\2048\")",
+      "PowerShell(New-Item -ItemType Directory -Force \"c:\\\\Users\\\\thsal\\\\Desktop\\\\work\\\\html5games\\\\games\\\\snake\")",
+      "PowerShell(New-Item -ItemType Directory -Force \"c:\\\\Users\\\\thsal\\\\Desktop\\\\work\\\\html5games\\\\games\\\\whack-a-mole\")",
+      "PowerShell(New-Item -ItemType Directory -Force \"c:\\\\Users\\\\thsal\\\\Desktop\\\\work\\\\html5games\\\\games\\\\breakout\")",
+      "Bash(git add *)"
+    ]
+  }
+}
