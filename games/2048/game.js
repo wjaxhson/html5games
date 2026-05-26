@@ -18,13 +18,11 @@ const loginStatusEl = document.getElementById('login-status');
 const SIZE = 4;
 let grid, score, best, won;
 
-// ── Save Manager (Firebase 로그인 시 서버 저장, 비로그인 시 localStorage) ──
+// ── Save Manager ─────────────────────────────────────────────────
 const saveManager = createSaveManager({
   gameId: 'game-2048',
   loginStatusEl,
-  getSaveData() {
-    return { best };
-  },
+  getSaveData() { return { best }; },
   applySaveData(data) {
     best = data.best ?? 0;
     bestEl.textContent = best;
@@ -39,6 +37,11 @@ startBtn.addEventListener('click', () => {
 });
 newGameBtn.addEventListener('click', newGame);
 retryBtn.addEventListener('click', newGame);
+
+// D-Pad 버튼
+['up', 'down', 'left', 'right'].forEach(d => {
+  document.getElementById(`btn-${d}`).addEventListener('click', () => move(d));
+});
 
 function newGame() {
   score = 0;
@@ -61,8 +64,9 @@ function addTile() {
   grid[r][c] = Math.random() < .9 ? 2 : 4;
 }
 
-function slideRow(row) {
-  let arr = row.filter(v => v);
+// 한 줄을 왼쪽으로 밀기 (score 부수효과 있음)
+function slideLeft(row) {
+  const arr = row.filter(v => v);          // 0 제거
   for (let i = 0; i < arr.length - 1; i++) {
     if (arr[i] === arr[i + 1]) {
       arr[i] *= 2;
@@ -70,33 +74,51 @@ function slideRow(row) {
       arr.splice(i + 1, 1);
     }
   }
-  while (arr.length < SIZE) arr.push(0);
+  while (arr.length < SIZE) arr.push(0);   // 오른쪽 패딩
   return arr;
 }
 
+// 방향별로 한 "줄"을 꺼내고 → 저장하는 헬퍼
+// 방향이 right/down 이면 뒤집어서 왼쪽 슬라이드를 적용하고 다시 뒤집음
+function getLine(idx, dir) {
+  switch (dir) {
+    case 'left':  return grid[idx].slice();
+    case 'right': return grid[idx].slice().reverse();
+    case 'up':    return grid.map(r => r[idx]);
+    case 'down':  return grid.map(r => r[idx]).reverse();
+  }
+}
+
+function setLine(idx, dir, line) {
+  switch (dir) {
+    case 'left':
+      grid[idx] = line;
+      break;
+    case 'right':
+      grid[idx] = line.slice().reverse();
+      break;
+    case 'up':
+      line.forEach((v, r) => { grid[r][idx] = v; });
+      break;
+    case 'down':
+      line.slice().reverse().forEach((v, r) => { grid[r][idx] = v; });
+      break;
+  }
+}
+
+// ── Move ─────────────────────────────────────────────────────────
 function move(dir) {
   let moved = false;
 
-  const rotate    = (g) => g[0].map((_, c) => g.map(r => r[c]).reverse());
-  const rotateBack = (g) => g[0].map((_, c) => g.map(r => r[r.length - 1 - c]));
-
-  let g = grid.map(r => [...r]);
-  if (dir === 'up')    g = rotate(rotate(rotate(g)));
-  if (dir === 'right') g = rotate(rotate(g));
-  if (dir === 'down')  g = rotate(g);
-
-  for (let r = 0; r < SIZE; r++) {
-    const old = [...g[r]];
-    g[r] = slideRow(g[r]);
-    if (g[r].join() !== old.join()) moved = true;
+  for (let i = 0; i < SIZE; i++) {
+    const line    = getLine(i, dir);
+    const before  = line.join(',');
+    const slid    = slideLeft(line);
+    if (slid.join(',') !== before) moved = true;
+    setLine(i, dir, slid);
   }
 
-  if (dir === 'up')    g = rotate(g);
-  if (dir === 'right') g = rotateBack(g);
-  if (dir === 'down')  g = rotate(rotate(rotate(g)));
-
   if (!moved) return;
-  grid = g;
 
   updateScore();
   addTile();
@@ -104,17 +126,19 @@ function move(dir) {
   checkEnd();
 }
 
+// ── End check ────────────────────────────────────────────────────
 function checkEnd() {
   let hasEmpty = false, hasWin = false;
   for (let r = 0; r < SIZE; r++)
     for (let c = 0; c < SIZE; c++) {
-      if (!grid[r][c]) hasEmpty = true;
+      if (!grid[r][c])      hasEmpty = true;
       if (grid[r][c] === 2048) hasWin = true;
     }
 
   if (hasWin && !won) { won = true; showMsg('🎉 2048 달성!'); return; }
   if (hasEmpty) return;
 
+  // 인접 합치기 가능 여부 체크
   for (let r = 0; r < SIZE; r++)
     for (let c = 0; c < SIZE; c++) {
       if (c < SIZE - 1 && grid[r][c] === grid[r][c + 1]) return;
@@ -134,12 +158,13 @@ async function updateScore() {
   if (score > (best ?? 0)) {
     best = score;
     bestEl.textContent = best;
-    await saveManager.save(); // 최고점 갱신 시 즉시 저장
+    await saveManager.save();
   }
 }
 
 // ── Render ───────────────────────────────────────────────────────
 function render() {
+  // 배경 셀 1회 생성
   if (!boardEl.querySelector('.cell')) {
     for (let i = 0; i < SIZE * SIZE; i++) {
       const cell = document.createElement('div');
@@ -148,11 +173,15 @@ function render() {
     }
   }
 
+  // 기존 타일 제거 후 재생성
   boardEl.querySelectorAll('.tile').forEach(t => t.remove());
 
-  const cells = boardEl.querySelectorAll('.cell');
-  const firstCell = cells[0].getBoundingClientRect();
+  const cells   = boardEl.querySelectorAll('.cell');
+  const firstRect = cells[0].getBoundingClientRect();
+  const boardRect = boardEl.getBoundingClientRect();
   const gap = 10;
+  const cellW = firstRect.width;
+  const cellH = firstRect.height;
 
   for (let r = 0; r < SIZE; r++) {
     for (let c = 0; c < SIZE; c++) {
@@ -160,37 +189,38 @@ function render() {
       if (!val) continue;
 
       const tile = document.createElement('div');
-      const cls  = val >= 2048 ? 't-super' : `t-${val}`;
-      tile.className = `tile ${cls}`;
-
-      const cellW = firstCell.width;
-      const cellH = firstCell.height;
+      tile.className = `tile ${val >= 2048 ? 't-super' : `t-${val}`}`;
       tile.style.width    = `${cellW}px`;
       tile.style.height   = `${cellH}px`;
       tile.style.top      = `${10 + r * (cellH + gap)}px`;
       tile.style.left     = `${10 + c * (cellW + gap)}px`;
-      tile.style.fontSize = cellW > 70 ? '28px' : '20px';
+      tile.style.fontSize = `${Math.max(14, Math.min(28, cellW * 0.38))}px`;
       tile.textContent    = val;
       boardEl.appendChild(tile);
     }
   }
 }
 
-// ── Input ────────────────────────────────────────────────────────
-document.addEventListener('keydown', (e) => {
+// ── Input: 키보드 ─────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
   if (!gameScreen.classList.contains('active')) return;
-  const map = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right' };
+  const map = { ArrowUp:'up', ArrowDown:'down', ArrowLeft:'left', ArrowRight:'right' };
   if (map[e.key]) { e.preventDefault(); move(map[e.key]); }
 });
 
+// ── Input: 터치 스와이프 ──────────────────────────────────────────
 let tx = 0, ty = 0;
-boardWrap.addEventListener('touchstart', e => { tx = e.touches[0].clientX; ty = e.touches[0].clientY; }, { passive: true });
+boardWrap.addEventListener('touchstart', e => {
+  tx = e.touches[0].clientX;
+  ty = e.touches[0].clientY;
+}, { passive: true });
+
 boardWrap.addEventListener('touchend', e => {
   const dx = e.changedTouches[0].clientX - tx;
   const dy = e.changedTouches[0].clientY - ty;
-  if (Math.abs(dx) < 20 && Math.abs(dy) < 20) return;
+  if (Math.abs(dx) < 20 && Math.abs(dy) < 20) return;   // 너무 짧은 스와이프 무시
   if (Math.abs(dx) > Math.abs(dy)) move(dx > 0 ? 'right' : 'left');
-  else move(dy > 0 ? 'down' : 'up');
+  else                              move(dy > 0 ? 'down'  : 'up');
 }, { passive: true });
 
 window.addEventListener('resize', render);

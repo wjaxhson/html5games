@@ -187,3 +187,49 @@ body {
 #game-message.hidden { display: none; }
 #message-text { font-size: 28px; font-weight: 900; color: #f8fafc; }
 #game-message .btn-start { width: auto; padding: 14px 32px; }
+
+/* ── D-Pad (모바일 방향 버튼) ── */
+.dpad {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin-top: 16px;
+  width: 100%;
+}
+.dpad-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.dpad-btn {
+  width: 64px;
+  height: 64px;
+  border: none;
+  border-radius: 14px;
+  background: #1e293b;
+  border: 1px solid #334155;
+  color: #f59e0b;
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition: background .1s, transform .08s;
+  user-select: none;
+}
+.dpad-btn:active {
+  background: #334155;
+  transform: scale(.92);
+}
+.dpad-center {
+  width: 64px;
+  height: 64px;
+}
+
+/* 데스크탑에선 D-Pad 숨기기 */
+@media (hover: hover) and (pointer: fine) {
+  .dpad { display: none; }
+}

@@ -54,10 +54,19 @@
       <div id="login-status" class="login-status"></div>
       <div id="board-wrap">
         <div id="board"></div>
+        <div id="game-message" class="hidden">
+          <p id="message-text"></p>
+          <button id="retry-btn" class="btn-start">다시하기 →</button>
+        </div>
       </div>
-      <div id="game-message" class="hidden">
-        <p id="message-text"></p>
-        <button id="retry-btn" class="btn-start">다시하기 →</button>
+      <div class="dpad">
+        <button class="dpad-btn" id="btn-up">▲</button>
+        <div class="dpad-row">
+          <button class="dpad-btn" id="btn-left">◀</button>
+          <div class="dpad-center"></div>
+          <button class="dpad-btn" id="btn-right">▶</button>
+        </div>
+        <button class="dpad-btn" id="btn-down">▼</button>
       </div>
     </div>
   </div>
