@@ -21,7 +21,18 @@ export const gameFolders = [
   "2048",
   "snake",
   "whack-a-mole",
-  "breakout"
+  "breakout",
+  "tetris",
+  "memory-card",
+  "typing-test",
+  "minesweeper",
+  "space-invaders",
+  "simon-says",
+  "rhythm-tap",
+  "bubble-shooter",
+  "math-rush",
+  "rope-swing",
+  "wordle"
 ];
 ```
 
@@ -119,4 +130,15 @@ games/2048/
 games/snake/
 games/whack-a-mole/
 games/breakout/
+games/tetris/
+games/memory-card/
+games/typing-test/
+games/minesweeper/
+games/space-invaders/
+games/simon-says/
+games/rhythm-tap/
+games/bubble-shooter/
+games/math-rush/
+games/rope-swing/
+games/wordle/
 ```

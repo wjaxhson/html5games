@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>숫자 퀴즈</title>
+  <link rel="stylesheet" href="../../shared/common.css">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <a href="../../index.html" class="back-link">← 게임 목록</a>
+  <div id="app">
+    <div id="start-screen" class="screen active">
+      <div class="brand">Math Game</div>
+      <div class="title-main">➕ 숫자 퀴즈</div>
+      <div class="title-sub">60초 안에 최대한 많이 풀어보세요!</div>
+      <div class="rule-card">
+        <div class="rule-item"><div class="rule-dot">1</div><span>사칙연산 문제가 나옵니다. 4개 중 정답을 고르세요.</span></div>
+        <div class="rule-item"><div class="rule-dot">2</div><span>정답 → +10점 / 오답 → -3점, 시간 낭비!</span></div>
+        <div class="rule-item"><div class="rule-dot">3</div><span>연속 정답(콤보)이 쌓이면 보너스 점수!</span></div>
+      </div>
+      <button id="start-btn" class="btn-start">시작하기 →</button>
+    </div>
+    <div id="game-screen" class="screen">
+      <div class="hud">
+        <div class="hud-item"><span class="hud-label">점수</span><span class="hud-val" id="score">0</span></div>
+        <div class="hud-item"><span class="hud-label">콤보</span><span class="hud-val" id="combo">0</span></div>
+        <div class="hud-item"><span class="hud-label">시간</span><span class="hud-val" id="timer">60</span></div>
+        <div class="hud-item"><span class="hud-label">최고</span><span class="hud-val" id="best">0</span></div>
+      </div>
+      <div id="login-status" class="login-status"></div>
+      <div id="question"></div>
+      <div id="choices"></div>
+      <div id="feedback-bar"></div>
+    </div>
+    <div id="result-screen" class="screen">
+      <div class="result-card">
+        <div id="r-emoji" class="r-emoji"></div>
+        <div id="r-score" class="r-score"></div>
+        <div id="r-sub" class="r-sub"></div>
+      </div>
+      <button id="retry-btn" class="btn-start">다시하기 →</button>
+    </div>
+  </div>
+  <script type="module" src="./game.js"></script>
+</body>
+</html>

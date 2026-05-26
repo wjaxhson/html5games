@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>슈팅버블</title>
+  <link rel="stylesheet" href="../../shared/common.css">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <a href="../../index.html" class="back-link">← 게임 목록</a>
+  <div id="app">
+    <div id="start-screen" class="screen active">
+      <div class="brand">Puzzle Game</div>
+      <div class="title-main">🔵 슈팅버블</div>
+      <div class="title-sub">같은 색 버블을 3개 이상 연결해 터뜨리세요!</div>
+      <div class="rule-card">
+        <div class="rule-item"><div class="rule-dot">1</div><span>클릭/탭 위치로 버블을 발사합니다.</span></div>
+        <div class="rule-item"><div class="rule-dot">2</div><span>같은 색 3개 이상이 붙으면 팡! 터집니다.</span></div>
+        <div class="rule-item"><div class="rule-dot">3</div><span>버블이 화면 아래 경계선을 넘으면 게임 오버!</span></div>
+      </div>
+      <button id="start-btn" class="btn-start">시작하기 →</button>
+    </div>
+    <div id="game-screen" class="screen">
+      <div class="hud">
+        <div class="hud-item"><span class="hud-label">점수</span><span class="hud-val" id="score">0</span></div>
+        <div class="hud-item"><span class="hud-label">최고</span><span class="hud-val" id="best">0</span></div>
+        <div class="hud-item"><span class="hud-label">남은 발사</span><span class="hud-val" id="ammo">∞</span></div>
+      </div>
+      <div id="login-status" class="login-status"></div>
+      <canvas id="canvas"></canvas>
+    </div>
+  </div>
+  <script type="module" src="./game.js"></script>
+</body>
+</html>

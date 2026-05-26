@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>스페이스 인베이더</title>
+  <link rel="stylesheet" href="../../shared/common.css">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <a href="../../index.html" class="back-link">← 게임 목록</a>
+  <div id="app">
+    <div id="start-screen" class="screen active">
+      <div class="brand">Shooting Game</div>
+      <div class="title-main">👾 스페이스 인베이더</div>
+      <div class="title-sub">쳐들어오는 외계인을 모두 격파하라!</div>
+      <div class="rule-card">
+        <div class="rule-item"><div class="rule-dot">1</div><span>← → 이동, Space/탭 발사. 모바일 버튼도 지원.</span></div>
+        <div class="rule-item"><div class="rule-dot">2</div><span>외계인이 바닥까지 내려오거나 목숨 3개를 잃으면 게임 오버.</span></div>
+        <div class="rule-item"><div class="rule-dot">3</div><span>웨이브마다 외계인이 더 빨라집니다!</span></div>
+      </div>
+      <button id="start-btn" class="btn-start">시작하기 →</button>
+    </div>
+    <div id="game-screen" class="screen">
+      <div class="hud">
+        <div class="hud-item"><span class="hud-label">점수</span><span class="hud-val" id="score">0</span></div>
+        <div class="hud-item"><span class="hud-label">최고</span><span class="hud-val" id="best">0</span></div>
+        <div class="hud-item"><span class="hud-label">웨이브</span><span class="hud-val" id="wave">1</span></div>
+        <div class="hud-item"><span class="hud-label">목숨</span><span class="hud-val" id="lives">❤️❤️❤️</span></div>
+      </div>
+      <div id="login-status" class="login-status"></div>
+      <div class="canvas-wrap" id="canvas-wrap">
+        <canvas id="canvas"></canvas>
+        <div id="overlay" class="hidden"><div id="ov-title"></div><div id="ov-sub"></div><button id="ov-btn" class="btn-start">다시하기 →</button></div>
+      </div>
+      <div class="ctrl-btns">
+        <button class="cb" id="cb-left">◀</button>
+        <button class="cb cb-fire" id="cb-fire">🔥</button>
+        <button class="cb" id="cb-right">▶</button>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="./game.js"></script>
+</body>
+</html>

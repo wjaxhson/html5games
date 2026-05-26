@@ -18,7 +18,7 @@
 - [x] 게임 공통 레이아웃 작성 (`shared/game-layout.css`)
 - [x] 공용 저장 모듈 작성 (`shared/save.js`)
 
-### 게임
+### 게임 (1차)
 - [x] Simple Clicker
 - [x] Upgrade Clicker
 - [x] Crystal Miner
@@ -27,10 +27,23 @@
 - [x] Stroop Test
 - [x] Path Memory
 - [x] Expanding Map
-- [x] 2048 (Firebase 저장 연동)
+- [x] 2048 (Firebase 저장 연동, 모바일 D-패드)
 - [x] Snake — 스네이크 (Firebase 저장 연동)
 - [x] Whack-a-Mole — 두더지 잡기 (난이도별 Firebase 저장 연동)
-- [x] Breakout — 벽돌깨기 (Firebase 저장 연동)
+- [x] Breakout — 벽돌깨기 (Firebase 저장 연동, 속도·스테이지 버그 수정)
+
+### 게임 (2차)
+- [x] Tetris — 테트리스 (SRS 회전, 고스트, 모바일 스와이프)
+- [x] Memory Card — 메모리 카드 (4x4/6x6 이모지 매칭)
+- [x] Typing Test — 타자 연습 (60초 WPM)
+- [x] Minesweeper — 지뢰찾기 (첫 클릭 안전, 롱프레스 깃발)
+- [x] Space Invaders — 스페이스 인베이더 (웨이브, 파티클)
+- [x] Simon Says — 사이먼 게임 (색상 시퀀스)
+- [x] Rhythm Tap — 리듬 탭 (수축 원 타이밍)
+- [x] Bubble Shooter — 슈팅버블 (헥스 그리드, BFS 매칭)
+- [x] Math Rush — 숫자 퀴즈 (60초 사칙연산)
+- [x] Rope Swing — 로프 스윙 (진자 물리)
+- [x] Wordle — 워들 (5글자 추측, 6번 시도)
 
 ---
 
@@ -56,9 +69,9 @@
 - [ ] 랭킹
 - [ ] 업적
 
-### 게임 추가 후보
-- [ ] Simon Says (색상 패턴 기억)
-- [ ] Typing Speed Test (타이핑 속도)
-- [ ] Minesweeper (지뢰찾기)
-- [ ] Rhythm Tap (리듬 게임)
-
+### 게임 추가 후보 (3차)
+- [ ] Color Flood (색상 범람)
+- [ ] Nonogram (노노그램)
+- [ ] Tower Defense (타워 디펜스)
+- [ ] Sliding Puzzle (슬라이딩 퍼즐)
+- [ ] Crossword (크로스워드)

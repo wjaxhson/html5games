@@ -10,7 +10,18 @@ export const gameFolders = [
   "2048",
   "snake",
   "whack-a-mole",
-  "breakout"
+  "breakout",
+  "tetris",
+  "memory-card",
+  "typing-test",
+  "minesweeper",
+  "space-invaders",
+  "simon-says",
+  "rhythm-tap",
+  "bubble-shooter",
+  "math-rush",
+  "rope-swing",
+  "wordle"
 ];
 
 export async function loadGames() {

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>지뢰찾기</title>
+  <link rel="stylesheet" href="../../shared/common.css">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <a href="../../index.html" class="back-link">← 게임 목록</a>
+  <div id="app">
+    <div id="start-screen" class="screen active">
+      <div class="brand">Logic Game</div>
+      <div class="title-main">💣 지뢰찾기</div>
+      <div class="title-sub">숫자 단서로 지뢰를 피하세요!</div>
+      <div class="rule-card">
+        <div class="rule-item"><div class="rule-dot">1</div><span>클릭으로 칸을 열고, 길게 누르면 🚩 깃발 표시.</span></div>
+        <div class="rule-item"><div class="rule-dot">2</div><span>숫자는 주변 8칸의 지뢰 수를 나타냅니다.</span></div>
+        <div class="rule-item"><div class="rule-dot">3</div><span>첫 클릭은 항상 안전! 모두 열면 승리!</span></div>
+      </div>
+      <div class="diff-row">
+        <button class="diff-btn active" data-diff="easy">쉬움<br><small>8×8·10개</small></button>
+        <button class="diff-btn" data-diff="mid">보통<br><small>12×12·20개</small></button>
+        <button class="diff-btn" data-diff="hard">어려움<br><small>16×16·40개</small></button>
+      </div>
+      <button id="start-btn" class="btn-start">시작하기 →</button>
+    </div>
+    <div id="game-screen" class="screen">
+      <div class="hud">
+        <div class="hud-item"><span class="hud-label">💣</span><span class="hud-val" id="mines-left">0</span></div>
+        <div class="hud-item"><span class="hud-label">⏱</span><span class="hud-val" id="timer">0</span></div>
+        <div class="hud-item"><span class="hud-label">최고 (초)</span><span class="hud-val" id="best">-</span></div>
+        <button class="hud-btn" id="reset-btn">↺</button>
+      </div>
+      <div id="login-status" class="login-status"></div>
+      <div id="board-wrap"><div id="board"></div></div>
+      <div id="result-banner" class="hidden"></div>
+    </div>
+  </div>
+  <script type="module" src="./game.js"></script>
+</body>
+</html>

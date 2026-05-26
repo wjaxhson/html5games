@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>메모리 카드</title>
+  <link rel="stylesheet" href="../../shared/common.css">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <a href="../../index.html" class="back-link">← 게임 목록</a>
+  <div id="app">
+    <div id="start-screen" class="screen active">
+      <div class="brand">Memory Game</div>
+      <div class="title-main">🃏 메모리 카드</div>
+      <div class="title-sub">카드를 뒤집어 같은 짝을 찾아보세요!</div>
+      <div class="rule-card">
+        <div class="rule-item"><div class="rule-dot">1</div><span>카드 2장을 뒤집어 같은 그림이면 짝!이 됩니다.</span></div>
+        <div class="rule-item"><div class="rule-dot">2</div><span>모든 짝을 맞추면 클리어! 시도 횟수가 적을수록 고득점.</span></div>
+      </div>
+      <div class="diff-row">
+        <button class="diff-btn active" data-diff="easy">쉬움 (4×4)</button>
+        <button class="diff-btn" data-diff="hard">어려움 (6×6)</button>
+      </div>
+      <button id="start-btn" class="btn-start">시작하기 →</button>
+    </div>
+    <div id="game-screen" class="screen">
+      <div class="hud">
+        <div class="hud-item"><span class="hud-label">시도</span><span class="hud-val" id="tries">0</span></div>
+        <div class="hud-item"><span class="hud-label">짝</span><span class="hud-val" id="matched">0</span></div>
+        <div class="hud-item"><span class="hud-label">시간</span><span class="hud-val" id="timer">0</span></div>
+        <div class="hud-item"><span class="hud-label">최고</span><span class="hud-val" id="best">-</span></div>
+      </div>
+      <div id="login-status" class="login-status"></div>
+      <div id="grid"></div>
+    </div>
+    <div id="result-screen" class="screen">
+      <div class="result-card">
+        <div id="r-emoji" class="r-emoji"></div>
+        <div id="r-title" class="r-title"></div>
+        <div id="r-sub" class="r-sub"></div>
+      </div>
+      <button id="retry-btn" class="btn-start">다시하기 →</button>
+      <button id="home-btn" class="btn-sec">난이도 선택</button>
+    </div>
+  </div>
+  <script type="module" src="./game.js"></script>
+</body>
+</html>
