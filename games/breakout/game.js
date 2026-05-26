@@ -94,10 +94,11 @@ function newStage() {
 }
 
 function resetBall() {
+  const spd = 2.5 + stage * 0.25;   // 초기 속도 완만하게 (stage1=2.75, stage5=3.75)
   ball = {
     x: W / 2, y: H - 28 - PADDLE_H - BALL_R - 2,
-    vx: 3.5 + stage * 0.4,
-    vy: -(3.5 + stage * 0.4),
+    vx: spd,
+    vy: -spd,
     r: BALL_R,
   };
   waiting  = true;
@@ -171,10 +172,13 @@ function update() {
 
   // Stage clear
   if (bricks.every(b => !b.alive)) {
-    stage++; score += 100; updateHUD();
+    waiting = true;            // ← 즉시 업데이트 중단 (매 프레임 재진입 방지)
+    stage++; score += 100;
+    updateHUD();
     showOverlay('🎉', `스테이지 ${stage}!`, '+100 보너스! 준비하세요.', '계속 →', () => {
-      newStage(); overlay.classList.add('hidden');
+      newStage();
     });
+    return;                    // 이 프레임 나머지 처리 스킵
   }
 
   updateHUD();
@@ -273,7 +277,12 @@ function showOverlay(emoji, title, sub, btnText, cb) {
   overlaySub.textContent   = sub;
   overlayBtn.textContent   = btnText;
   overlay.classList.remove('hidden');
-  overlayBtn.onclick = () => { overlay.classList.add('hidden'); cb(); };
+  // onclick을 한 번만 실행되도록 교체 (연속 클릭 방지)
+  overlayBtn.onclick = () => {
+    overlay.classList.add('hidden');
+    overlayBtn.onclick = null;
+    cb();
+  };
 }
 
 // ── Input ────────────────────────────────────────────────────────
